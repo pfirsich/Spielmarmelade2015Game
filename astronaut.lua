@@ -8,6 +8,7 @@ do
         print("Seed:", astronaut.map.seed)
         astronaut.velocity = {0, 0}
         astronaut.position = vadd({tileToWorld(unpack(astronaut.map.spawn))}, vmul({1,1}, TILESIZE/2))
+        spaceInput = watchBinaryInput(keyboardCallback(" "))
     end
 
     function astronaut.update()
@@ -30,19 +31,58 @@ do
 
         if astronaut.spaceshipPeer and astronaut.initialized then -- game
             local accell = 75.0 * TILESIZE
-            local friction = 0.075 * TILESIZE
-            local gravity = 300.0 * TILESIZE
+            local frictionX = 0.075 * TILESIZE
+            local frictionY = 0.01 * TILESIZE
+            local gravity = 45.0 * TILESIZE
 
             local move = (love.keyboard.isDown("d") and 1 or 0) - (love.keyboard.isDown("a") and 1 or 0)
             astronaut.velocity[1] = astronaut.velocity[1] + move * accell * simulationDt
             astronaut.velocity[2] = astronaut.velocity[2] + gravity * simulationDt
-            astronaut.velocity[2] = astronaut.velocity[2] - ((love.keyboard.isDown("w") and 1 or 0) - (love.keyboard.isDown("s") and 1 or 0)) * 200
-            astronaut.velocity = vsub(astronaut.velocity, vmul(astronaut.velocity, friction * simulationDt))
+            astronaut.velocity[1] = astronaut.velocity[1] - astronaut.velocity[1] * frictionX * simulationDt
+            astronaut.velocity[2] = astronaut.velocity[2] - astronaut.velocity[2] * frictionY * simulationDt
 
-            if astronaut.onGround and love.keyboard.isDown(" ") then
+            if astronaut.onGround and spaceInput().pressed then
                 local jumpStrength = 15 * TILESIZE
                 astronaut.velocity[2] = -jumpStrength
-                print("Jump")
+            end
+
+            -- collision resolution
+            local function checkCollision()
+                local colCheckRange = {{worldToTiles(astronaut.map, unpack(astronaut.position))}, {0, 0}}
+                -- on gutdünkenl
+                colCheckRange[1] = {colCheckRange[1][1] - 1, colCheckRange[1][2] - 1}
+                colCheckRange[2] = {colCheckRange[1][1] + 2, colCheckRange[1][2] + 2}
+
+                local relBox = {{-62, -112}, {136, 236}}
+                local colBox = {
+                    vadd(astronaut.position, relBox[1]),
+                    relBox[2]
+                }
+
+                for y = colCheckRange[1][2], colCheckRange[2][2] do
+                    for x = colCheckRange[1][1], colCheckRange[2][1] do
+                        if astronaut.map[y][x] == TILE_INDICES.WALL then
+                            local mtv = aabbCollision(colBox, {{tileToWorld(x, y)}, {TILESIZE, TILESIZE}})
+                            if mtv then return mtv end
+                        end
+                    end
+                end
+
+                return nil
+            end
+
+            astronaut.onGround = false
+            local delta = vmul(astronaut.velocity, simulationDt)
+            astronaut.position[1] = astronaut.position[1] + delta[1]
+            if checkCollision() then astronaut.position[1] = astronaut.position[1] - delta[1] end
+            astronaut.position[2] = astronaut.position[2] + delta[2]
+            local mtv = checkCollision()
+            if mtv then
+                astronaut.velocity[2] = 0
+                astronaut.position = vadd(astronaut.position, vmul(mtv, 1.01))
+                if delta[2] > 0.0 then
+                    astronaut.onGround = true
+                end
             end
 
             -- send updates
@@ -50,7 +90,7 @@ do
 
             -- update camera
             local mouseX, mouseY = camera.screenToWorld(love.mouse.getPosition())
-            local camAimDist = TILESIZE * 2.0
+            local camAimDist = TILESIZE * 1.25
             astronaut.aimDirection = vMaxLen(vsub({mouseX, mouseY}, astronaut.position), camAimDist)
 
             camera.targetX, camera.targetY = unpack(vadd(astronaut.position, astronaut.aimDirection))

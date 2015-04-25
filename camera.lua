@@ -1,5 +1,5 @@
  do
-    camera = {targetX = 0.0, targetY = 0.0, targetZoom = 0.2, x = 0.0, y = 0.0, zoom = 1.0, scale = 1.0}
+    camera = {targetX = 0.0, targetY = 0.0, targetZoom = 0.6, x = 0.0, y = 0.0, zoom = 1.0, scale = 1.0}
 
     function camera.push()
         love.graphics.push()
@@ -31,7 +31,7 @@
     function camera.update(speed)
         camera.resolutionZoomFactor = love.window.getHeight()/720.0
 
-        speed = speed or 10.0
+        speed = speed or 6.0
         local tfac = speed * simulationDt
         -- Interpolation
         camera.x = camera.x + (camera.targetX - camera.x) * tfac
