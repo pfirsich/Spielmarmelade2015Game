@@ -65,7 +65,7 @@ function aabbCollision(A, B) -- box: {{xleft, xright}, {yleft, yright}} (DAS WAR
 	if  intervalsOverlap({A[1][1], A[1][1] + A[2][1]}, {B[1][1], B[1][1] + B[2][1]})
     and intervalsOverlap({A[1][2], A[1][2] + A[2][2]}, {B[1][2], B[1][2] + B[2][2]}) then
         return {0, 0}
-		
+
 	else
 		return nil
 	end
@@ -73,6 +73,10 @@ end
 
 function worldToTiles(map, x, y)
     return clamp(math.floor(x / TILESIZE) + 1, 1, map.width), clamp(math.floor(y / TILESIZE) + 1, 1, map.height)
+end
+
+function tileToWorld(x, y)
+    return (x-1)*TILESIZE, (y-1)*TILESIZE
 end
 
 function screenToTiles(map, x, y)
