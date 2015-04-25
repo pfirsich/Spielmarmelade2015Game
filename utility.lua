@@ -76,11 +76,11 @@ function aabbCollision(A, B) -- box: {{xleft, xright}, {yleft, yright}} (DAS WAR
 
 		local yOverlap = 0
 		local yMTVSign = 1
-		if A[1][2] + A[2][2] - B[2][1] < B[1][2] + B[2][2] - A[2][1] then
-			yOverlap = A[1][2] + A[2][2] - B[2][1]
+		if A[1][2] + A[2][2] - B[1][2] < B[1][2] + B[2][2] - A[1][2] then
+			yOverlap = A[1][2] + A[2][2] - B[1][2]
 			yMTVSign = -1
 		else
-			yOverlap = B[1][2] + B[2][2] - A[2][1]
+			yOverlap = B[1][2] + B[2][2] - A[1][2]
 			yMTVSign = 1
 		end
 

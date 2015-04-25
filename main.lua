@@ -14,6 +14,7 @@ require "mapgen"
 require "gfx"
 
 function love.load()
+    mouseLeftInput = watchBinaryInput(mouseButtonCallback("l"))
     initGFX()
 
     setState(startscreen)

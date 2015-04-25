@@ -66,6 +66,7 @@ do
                     spaceship.astronaut = {
                         position = {tileToWorld(unpack(spaceship.map.spawn))}
                     }
+                    camera.targetX, camera.targetY = unpack(spaceship.astronaut.position)
 
                     event.peer:send("INITD") -- initialization done
                 elseif type == "PLPOS" then
