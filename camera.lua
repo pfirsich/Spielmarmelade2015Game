@@ -1,4 +1,4 @@
- do 
+ do
     local camAheadDis = 200
 
     camera = {targetX = 0.0, targetY = 0.0, targetZoom = 1.0, x = 0.0, y = 0.0, zoom = 1.0, scale = 1.0, resolutionZoomFactor = 1.0}
@@ -6,7 +6,7 @@
 
 
     function camera.load()
-        
+
     end
 
     function camera.updateResolution()
@@ -28,27 +28,14 @@
 
     camera.pop = love.graphics.pop
 
-    function camera.update()    
-        local tfac = 0.1 * simulationDt
+    function camera.update(speed)
+        speed = speed or 20.0
+        local tfac = speed * simulationDt
         -- Interpolation
-        position = p + (t-p) * speed * simulationDt
         camera.x = camera.x + (camera.targetX - camera.x) * tfac
         camera.y = camera.y + (camera.targetY - camera.y) * tfac
         -- Zoom
         camera.zoom = camera.zoom + (camera.targetZoom - camera.zoom) * tfac
         camera.scale = camera.zoom * camera.resolutionZoomFactor
-    end
-
-
-    function camera.set(x, y, headingDirection)
-        -- Set Camera to player/position
-        if getState() == astronaut then
-            camera.targetX = x + headingDirection and camAheadDis or -camAheadDis
-            camera.targetZoom = 2.0
-        else
-            camera.targetX = x
-            camera.targetZoom = 1.0
-        end
-        camera.targetY = y
     end
 end
