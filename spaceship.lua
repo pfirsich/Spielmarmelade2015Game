@@ -22,7 +22,7 @@ do
 
                     spaceship.initialized = true
                     spaceship.astronaut = {
-                        position = {0, 0}
+                        position = {tileToWorld(unpack(spaceship.map.spawn))}
                     }
 
                     event.peer:send("INITD") -- initialization done
@@ -36,7 +36,7 @@ do
 
         if spaceship.astronautPeer and spaceship.initialized then -- game
             local mouseX, mouseY = love.mouse.getPosition()
-            local moveBorder = 12
+            local moveBorder = love.window.getHeight()*0.15
             -- TODO: mouse wheel zoom?
             local camMoveSpeed = 1.8 * simulationDt * TILESIZE
             if mouseX <= moveBorder then camera.targetX = camera.targetX - camMoveSpeed end
