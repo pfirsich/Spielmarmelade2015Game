@@ -1,13 +1,36 @@
-function love.load()
+require "states"
+require "startscreen"
+require "spaceship"
+require "astronaut"
+require "utility"
+require "inputs"
 
+function love.load()
+    setState(startscreen)
 end
 
 function love.update()
+    updateWatchedInputs()
 
+    local state = getState()
+    state.time = (state.time or 0) + simulationDt
+    if state.update then state.update() end
+end
+
+function love.textinput(text)
+    if getState().textinput then getState().textinput(text) end
 end
 
 function love.draw()
+    if getState().draw then getState().draw() end
+end
 
+function love.keypressed(key, isrepeat)
+    if getState().keypressed then getState().keypressed(key, isrepeat) end
+end
+
+function love.keyreleased(key)
+    if getState().keyreleased then getState().keyreleased(key) end
 end
 
 function love.run()
@@ -28,7 +51,7 @@ function love.run()
     -- Main loop
     while true do
         while simulationTime < love.timer.getTime() do
-            simulationTime = simulationTime + timeStepDt
+            simulationTime = simulationTime + simulationDt
 
             -- Process events.
             if love.event then
