@@ -2,6 +2,7 @@
     camera = {targetX = 0.0, targetY = 0.0, targetZoom = 0.6, x = 0.0, y = 0.0, zoom = 1.0, scale = 1.0}
 
     function camera.push()
+        parallax = parallax or 1.0
         love.graphics.push()
         -- Center Screen
         love.graphics.translate(love.window.getWidth()/2, love.window.getHeight()/2)

@@ -36,14 +36,14 @@ do
             local frictionY = 0.01 * TILESIZE
             local gravity = 45.0 * TILESIZE
             local ladderSpeed = 4.0 * TILESIZE
-            
+
             local tilex, tiley = worldToTiles(astronaut.map, astronaut.position[1], astronaut.position[2])
             local isOnLadder = (astronaut.map[tiley][tilex] == TILE_INDICES.LADDER)
             if isOnLadder == false then astronaut.onLadder = false end
 
             local move = (love.keyboard.isDown("d") and 1 or 0) - (love.keyboard.isDown("a") and 1 or 0)
             astronaut.velocity[1] = astronaut.velocity[1] + move * accell * simulationDt -- side movement
-            if astronaut.onLadder == false then 
+            if astronaut.onLadder == false then
                 astronaut.velocity[2] = astronaut.velocity[2] + gravity * simulationDt -- vertical gravity
                 if isOnLadder and love.keyboard.isDown("w") then astronaut.onLadder = true end
             else
@@ -112,15 +112,8 @@ do
     end
 
     function astronaut.draw()
-        if astronaut.spaceshipPeer then
-            camera.push()
-                drawMap(astronaut.map)
-
-                if astronaut.initialized then
-                    love.graphics.setColor(255, 255, 255, 255)
-                    love.graphics.draw(astronautImage, astronaut.position[1], astronaut.position[2], 0, 1.0, 1.0, astronautImage:getWidth()/2, astronautImage:getHeight()/2)
-                end
-            camera.pop()
+        if astronaut.spaceshipPeer and astronaut.initialized then
+            drawGame()
             love.graphics.print("Astronaut", 0, 0)
         else
             love.graphics.print("Waiting for spaceship", 0, 0)

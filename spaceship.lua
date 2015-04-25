@@ -63,15 +63,13 @@ do
                     spaceship.map = generateLevel(tonumber(vals[2]))
 
                     spaceship.initialized = true
-                    spaceship.astronaut = {
-                        position = {tileToWorld(unpack(spaceship.map.spawn))}
-                    }
-                    camera.targetX, camera.targetY = unpack(spaceship.astronaut.position)
+                    astronaut.position = {tileToWorld(unpack(spaceship.map.spawn))}
+                    camera.targetX, camera.targetY = unpack(astronaut.position)
 
                     event.peer:send("INITD") -- initialization done
                 elseif type == "PLPOS" then
                     local vals = split(event.data, ":")
-                    spaceship.astronaut.position = {tonumber(vals[2]), tonumber(vals[3])}
+                    astronaut.position = {tonumber(vals[2]), tonumber(vals[3])}
                 end
             end
             event = spaceship.host:service()
@@ -129,17 +127,7 @@ do
 
     function spaceship.draw()
         if spaceship.astronautPeer and spaceship.initialized then
-            camera.push()
-                drawMap(spaceship.map)
-                love.graphics.setColor(255, 255, 255, 255)
-
-                if spaceship.initialized then
-                    love.graphics.draw( astronautImage, spaceship.astronaut.position[1], spaceship.astronaut.position[2], 0, 1.0, 1.0,
-                                        astronautImage:getWidth()/2, astronautImage:getHeight()/2)
-                end
-
-            camera.pop()
-
+            drawGame()
             spaceship.drawHUD()
 
             love.graphics.print("Spaceship", 0, 0)

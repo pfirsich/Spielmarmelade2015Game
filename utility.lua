@@ -10,7 +10,7 @@ end
 
 function setResolution(w, h, flags) -- this is encapsulated, so if canvases are used later, they can be updated here!
 	if love.window.setMode(w, h, flags) then
-        -- update canvases and stuff here!
+        reinitGFX()
     else
 		error(string.format("Resolution %dx%d could not be set successfully.", w, h))
 	end
