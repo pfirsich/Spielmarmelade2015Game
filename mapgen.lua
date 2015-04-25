@@ -32,10 +32,11 @@ do
         local midx = level.width/2
         local midy = level.height/2
         -- Generate two random branches
-        generateBranch(level, midx, midy, 1, rand(1,rand(1,2))) -- right
-        generateBranch(level, midx, midy, 3, rand(1,rand(1,2))) -- left
+        generateBranch(level, midx, midy, 2, rand(1,rand(1,2))) -- right
+        generateBranch(level, midx, midy, 4, rand(1,rand(1,2))) -- left
 
         -- Spawn Point
+        level[midy][midx] = TILE_INDICES.FREE
         level.spawn = {midx, midy}
 
         return level
