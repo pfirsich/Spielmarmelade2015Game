@@ -43,14 +43,22 @@ do
     end
 
 
-    function getRandomDirection()
+    function getRandomDirection(x, y)
         local d = 0
         if rand(1,4) <= 1 then
-            -- Horizontal
-            if rand(1,2) == 1 then d = 1 else d = 3 end
-        else
             -- Vertical
+            if rand(1,2) == 1 then d = 1 else d = 3 end
+            if rand(1,3) > 1 then
+                -- Away from center
+                if 2*y > maxh then d = 1 else d = 3 end
+            end
+        else
+            -- Horizontal
             if rand(1,2) == 1 then d = 2 else d = 4 end
+            if rand(1,3) > 1 then
+                -- Away from center
+                if 2*x > maxw then d = 4 else d = 2 end
+            end
         end
         return d
     end
@@ -77,7 +85,7 @@ do
             y = outPos[2]
             -- New Random Direction (just not straight back)
             repeat
-                newdir = getRandomDirection()
+                newdir = getRandomDirection(x, y)
             until math.abs(direction - newdir) ~= 2
             direction = newdir
             dir = dirs[direction]
