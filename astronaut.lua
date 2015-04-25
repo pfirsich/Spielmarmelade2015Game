@@ -104,6 +104,7 @@ do
                 drawMap(astronaut.map)
 
                 if astronaut.initialized then
+                    love.graphics.setColor(255, 255, 255, 255)
                     love.graphics.draw(astronautImage, astronaut.position[1], astronaut.position[2], 0, 1.0, 1.0, astronautImage:getWidth()/2, astronautImage:getHeight()/2)
                 end
             camera.pop()

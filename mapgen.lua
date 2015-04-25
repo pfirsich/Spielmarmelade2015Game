@@ -39,6 +39,17 @@ do
         generateCave(level, midx, midy)
         level.spawn = {midx, midy}
 
+        level.mapMeta = {}
+        for y = 1, level.height do
+            level.mapMeta[y] = {}
+            for x = 1, level.width do
+                level.mapMeta[y][x] = {
+                    tile = love.math.random(1, 2) + (love.math.random() < 0.5 and 1 or 0) * 4,
+                    color = love.math.random(190, 255)
+                }
+            end
+        end
+
         return level
     end
 
