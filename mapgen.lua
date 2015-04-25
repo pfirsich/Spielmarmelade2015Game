@@ -38,6 +38,8 @@ do
         -- Spawn Point
         generateCave(level, midx, midy)
         level.spawn = {midx, midy}
+        
+        refineLevel(level)
 
         level.mapMeta = {}
         for y = 1, level.height do
@@ -201,5 +203,22 @@ do
                 end
         end
         file:close()
+    end
+    
+    
+    function refineLevel(level)
+        -- Step 1: Remove inner blocks for better looks
+        local lvl = copyTable(level)
+        for y = 2, level.height-1 do
+            for x = 2, level.width-1 do
+                if lvl[y][x] == TILE_INDICES.WALL then
+                    if lvl[y-1][x] == TILE_INDICES.WALL and lvl[y+1][x] == TILE_INDICES.WALL and lvl[y][x+1] == TILE_INDICES.WALL and lvl[y][x-1] == TILE_INDICES.WALL then 
+                        if lvl[y-1][x-1] == TILE_INDICES.WALL and lvl[y-1][x+1] == TILE_INDICES.WALL and lvl[y+1][x-1] == TILE_INDICES.WALL and lvl[y+1][x+1] == TILE_INDICES.WALL then
+                            level[y][x] = TILE_INDICES.FREE
+                        end
+                    end
+                end
+            end
+        end
     end
 end

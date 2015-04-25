@@ -9,6 +9,7 @@ do
         astronaut.velocity = {0, 0}
         astronaut.position = vadd({tileToWorld(unpack(astronaut.map.spawn))}, vmul({1,1}, TILESIZE/2))
         spaceInput = watchBinaryInput(keyboardCallback(" "))
+        astronaut.onLadder = false
     end
 
     function astronaut.update()
@@ -34,16 +35,28 @@ do
             local frictionX = 0.075 * TILESIZE
             local frictionY = 0.01 * TILESIZE
             local gravity = 45.0 * TILESIZE
+            local ladderSpeed = 4.0 * TILESIZE
+            
+            local tilex, tiley = worldToTiles(astronaut.map, astronaut.position[1], astronaut.position[2])
+            local isOnLadder = (astronaut.map[tiley][tilex] == TILE_INDICES.LADDER)
+            if isOnLadder == false then astronaut.onLadder = false end
 
             local move = (love.keyboard.isDown("d") and 1 or 0) - (love.keyboard.isDown("a") and 1 or 0)
-            astronaut.velocity[1] = astronaut.velocity[1] + move * accell * simulationDt
-            astronaut.velocity[2] = astronaut.velocity[2] + gravity * simulationDt
-            astronaut.velocity[1] = astronaut.velocity[1] - astronaut.velocity[1] * frictionX * simulationDt
-            astronaut.velocity[2] = astronaut.velocity[2] - astronaut.velocity[2] * frictionY * simulationDt
+            astronaut.velocity[1] = astronaut.velocity[1] + move * accell * simulationDt -- side movement
+            if astronaut.onLadder == false then 
+                astronaut.velocity[2] = astronaut.velocity[2] + gravity * simulationDt -- vertical gravity
+                if isOnLadder and love.keyboard.isDown("w") then astronaut.onLadder = true end
+            else
+                local moveUp = (love.keyboard.isDown("s") and 1 or 0) - (love.keyboard.isDown("w") and 1 or 0)
+                astronaut.velocity[2] = ladderSpeed * moveUp
+            end
+            astronaut.velocity[1] = astronaut.velocity[1] - astronaut.velocity[1] * frictionX * simulationDt -- x friction
+            astronaut.velocity[2] = astronaut.velocity[2] - astronaut.velocity[2] * frictionY * simulationDt -- y friction
 
-            if astronaut.onGround and spaceInput().pressed then
+            if (astronaut.onGround or astronaut.onLadder) and spaceInput().pressed then
                 local jumpStrength = 18 * TILESIZE
                 astronaut.velocity[2] = -jumpStrength
+                astronaut.onLadder = false
             end
 
             -- collision resolution
