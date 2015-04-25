@@ -84,19 +84,19 @@ do
             local mouseL = mouseLeftInput().pressed
             local mouseR = mouseRightInput().pressed
             -- Button Interaction
-            spaceship.handleButtons(mouseX, mouseY)
+            spaceship.handleButtons(mouseX, mouseY, mouseL)
             -- Scrolling
             local moveBorder = love.window.getHeight()*0.15
             if mouseY >= spaceship.hudTop then 
-                moveBorder = 12 end
+                moveBorder = 12
             else 
                 -- not on HUD -> place tile?
-                if mouseL == 1 then
+                if mouseL then
                     -- ...
                 end
             end
             -- Deselect
-            if mouseR == 1 then spaceship.selected = 0 end
+            if mouseR then spaceship.selected = 0 end
             -- TODO: mouse wheel zoom?
             local camMoveSpeed = 1.8 * simulationDt * TILESIZE
             if mouseX <= moveBorder then camera.targetX = camera.targetX - camMoveSpeed end
@@ -120,7 +120,7 @@ do
                 spaceship.tooltip = "A button is being hovered"
                 spaceship.hovered = i
                 -- Click
-                if mL == 1 then 
+                if mL then 
                     spaceship.selected = i
                 end
             end
