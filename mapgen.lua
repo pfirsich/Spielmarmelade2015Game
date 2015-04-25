@@ -1,12 +1,12 @@
 do
     TILE_INDICES = {
         FREE = 0,
-        WALL = 2,
+        WALL = 1,
         SPAWN = 4,
         GOAL = 4,
         WATER = 5,
         OIL = 6,
-        LADDER = 7,
+        LADDER = 3,
     }
 
     local maxw = 320
@@ -36,7 +36,7 @@ do
         generateBranch(level, midx, midy, 4, rand(1,rand(1,2))) -- left
 
         -- Spawn Point
-        level[midy][midx] = TILE_INDICES.FREE
+        generateCave(level, midx, midy)
         level.spawn = {midx, midy}
 
         return level
@@ -109,7 +109,7 @@ do
         else
             steps = rand(3, 10)
         end
-        local offL = rand(0,1)
+        local offL = rand(1,2)
         local offR = rand(0,1)
         local requiresLadder = (vertical and steps > 2)
         --if dir[2] > 0 and rand(1,3) == 1 then requiresLadder = false end
@@ -134,7 +134,7 @@ do
                 level[y][x] = TILE_INDICES.LADDER
             end
             -- Change offset
-            if rand(1,4)==1 then offL = rand(0,1) end
+            if rand(1,4)==1 then offL = rand(1,2) end
             if rand(1,4)==1 then offR = rand(0,1) end
             -- Cave
             if rand(1,32) == 1 then generateCave(level,x,y) end
@@ -159,7 +159,7 @@ do
                 for x = -offL, offR do
                     lx = ox+x
                     ly = oy+y
-                    --if level[ly][lx] == TILE_INDICES.WALL then level[ly][lx] = TILE_INDICES.FREE end
+                    if level[ly][lx] == TILE_INDICES.WALL then level[ly][lx] = TILE_INDICES.FREE end
                 end
             end
         end
