@@ -6,7 +6,7 @@ do
         if astronaut.host == nil then error("Host is nil.") end
         astronaut.map = generateLevel(love.math.random(1, 10000000))
         astronaut.velocity = {0, 0}
-        astronaut.position = {tileToWorld(unpack(astronaut.map.spawn))}
+        astronaut.position = vadd({tileToWorld(unpack(astronaut.map.spawn))}, vmul({1,1}, TILESIZE/2))
     end
 
     function astronaut.update()
@@ -28,16 +28,22 @@ do
         end
 
         if astronaut.spaceshipPeer and astronaut.initialized then -- game
-            local accell = 55.0 * TILESIZE
+            local accell = 75.0 * TILESIZE
             local friction = 0.075 * TILESIZE
             local gravity = 300.0 * TILESIZE
 
             local move = (love.keyboard.isDown("d") and 1 or 0) - (love.keyboard.isDown("a") and 1 or 0)
             astronaut.velocity[1] = astronaut.velocity[1] + move * accell * simulationDt
-            --astronaut.velocity[2] = astronaut.velocity[2] + gravity * simulationDt
+            astronaut.velocity[2] = astronaut.velocity[2] + gravity * simulationDt
             astronaut.velocity[2] = astronaut.velocity[2] - ((love.keyboard.isDown("w") and 1 or 0) - (love.keyboard.isDown("s") and 1 or 0)) * 200
             astronaut.velocity = vsub(astronaut.velocity, vmul(astronaut.velocity, friction * simulationDt))
             astronaut.position = vadd(astronaut.position, vmul(astronaut.velocity, simulationDt))
+
+            if astronaut.onGround and love.keyboard.isDown(" ") then
+                local jumpStrength = 15 * TILESIZE
+                astronaut.velocity[2] = jumpStrength
+                print("Jump")
+            end
 
             -- resolve collisions
             local colCheckRange = {{worldToTiles(astronaut.map, unpack(astronaut.position))}, {0, 0}}
@@ -50,18 +56,26 @@ do
                 vadd(astronaut.position, relBox[1]),
                 relBox[2]
             }
-            astronaut.wonky = false
+
+            astronaut.onGround = false
             for y = colCheckRange[1][2], colCheckRange[2][2] do
                 for x = colCheckRange[1][1], colCheckRange[2][1] do
                     if astronaut.map[y][x] == TILE_INDICES.WALL then
                         local mtv = aabbCollision(colBox, {{tileToWorld(x, y)}, {TILESIZE, TILESIZE}})
                         if mtv then
-                            astronaut.wonky = true
                             astronaut.position = vadd(astronaut.position, vmul(mtv, 1.01))
                             colBox[1] = vadd(astronaut.position, relBox[1])
+
+                            if math.abs(mtv[2]) > 1e6 then
+                                astronaut.onGround = true
+                            end
                         end
                     end
                 end
+            end
+
+            if astronaut.onGround then
+                astronaut.velocity[2] = 0.0
             end
 
             -- send updates
@@ -81,8 +95,6 @@ do
         if astronaut.spaceshipPeer then
             camera.push()
                 drawMap(astronaut.map)
-
-                love.graphics.setColor(astronaut.wonky and {255, 0, 0} or {255, 255, 255, 255})
 
                 if astronaut.initialized then
                     love.graphics.draw(astronautImage, astronaut.position[1], astronaut.position[2], 0, 1.0, 1.0, astronautImage:getWidth()/2, astronautImage:getHeight()/2)
