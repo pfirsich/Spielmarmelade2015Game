@@ -40,3 +40,11 @@ function copyTable(from)
 	end
 	return to
 end
+
+function split(str, sep)
+    local ret = {}
+    for part in string.gmatch(str, "([^" .. sep .. "]+)") do
+        ret[#ret+1] = part
+    end
+    return ret
+end

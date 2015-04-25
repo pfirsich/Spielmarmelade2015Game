@@ -2,7 +2,7 @@ do
     startscreen = {}
 
     function startscreen.enter()
-        startscreen.ip = "127.0.0.1:3092"
+        startscreen.ip = "127.0.0.1"
     end
 
     function startscreen.update()
@@ -11,7 +11,7 @@ do
 
     function startscreen.draw()
         love.graphics.print("--- Choose mode ---\nPress 'H' to host a game (be the astronaut) or 'C' to connect to a game.", 0, 0)
-        love.graphics.print("IP (X.X.X.X:port): " .. startscreen.ip, 0, 40)
+        love.graphics.print("IP (X.X.X.X): " .. startscreen.ip, 0, 40)
         if startscreen.message then love.graphics.print(startscreen.message, 0, 55) end
     end
 
@@ -21,12 +21,12 @@ do
         end
 
         if key == "h" then
-            --setState(astronaut)
+            setState(astronaut)
         end
 
         if key == "c" then
-            if string.match(startscreen.ip, "^%d+.%d+.%d+.%d+:%d+$") ~= nil then
-                --setState(spaceship, startscreen.ip)
+            if string.match(startscreen.ip, "^%d+.%d+.%d+.%d+$") ~= nil then
+                setState(spaceship, startscreen.ip)
             else
                 startscreen.message = "IP invalid! Please make sure it matches the suggested format!"
             end

@@ -1,11 +1,18 @@
+PORT = "3092"
+TILESIZE = 256
+
+require "math_vec"
 require "states"
-require "startscreen"
 require "spaceship"
 require "astronaut"
+require "startscreen"
 require "utility"
 require "inputs"
+require "enet"
 
 function love.load()
+    astronautImage = love.graphics.newImage("media/images/survivor.png")
+
     setState(startscreen)
 end
 
