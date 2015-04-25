@@ -34,7 +34,7 @@ do
             local accell = 75.0 * TILESIZE
             local frictionX = 0.075 * TILESIZE
             local frictionY = 0.01 * TILESIZE
-            local gravity = 45.0 * TILESIZE
+            local gravity = 25.0 * TILESIZE
             local ladderSpeed = 4.0 * TILESIZE
 
             local tilex, tiley = worldToTiles(astronaut.map, astronaut.position[1], astronaut.position[2])
@@ -54,7 +54,7 @@ do
             astronaut.velocity[2] = astronaut.velocity[2] - astronaut.velocity[2] * frictionY * simulationDt -- y friction
 
             if (astronaut.onGround or astronaut.onLadder) and spaceInput().pressed then
-                local jumpStrength = 18 * TILESIZE
+                local jumpStrength = 13.5 * TILESIZE
                 astronaut.velocity[2] = -jumpStrength
                 astronaut.onLadder = false
             end
