@@ -42,7 +42,7 @@ do
             astronaut.velocity[2] = astronaut.velocity[2] - astronaut.velocity[2] * frictionY * simulationDt
 
             if astronaut.onGround and spaceInput().pressed then
-                local jumpStrength = 15 * TILESIZE
+                local jumpStrength = 18 * TILESIZE
                 astronaut.velocity[2] = -jumpStrength
             end
 
@@ -90,7 +90,7 @@ do
 
             -- update camera
             local mouseX, mouseY = camera.screenToWorld(love.mouse.getPosition())
-            local camAimDist = TILESIZE * 1.25
+            local camAimDist = TILESIZE * 1.5
             astronaut.aimDirection = vMaxLen(vsub({mouseX, mouseY}, astronaut.position), camAimDist)
 
             camera.targetX, camera.targetY = unpack(vadd(astronaut.position, astronaut.aimDirection))
