@@ -25,7 +25,7 @@ do
         for y = 1, level.height do
             level[y] = {}
             for x = 1, level.width do
-                level[y][x] = math.random() < 0.5 and TILE_INDICES.WALL or TILE_INDICES.FREE
+                level[y][x] = TILE_INDICES.WALL
             end
         end
 

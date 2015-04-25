@@ -5,6 +5,8 @@ do
         astronaut.host = enet.host_create("localhost:" .. PORT)
         if astronaut.host == nil then error("Host is nil.") end
         astronaut.map = generateLevel(love.math.random(1, 10000000))
+        astronaut.velocity = {0, 0}
+        astronaut.position = {tileToWorld(unpack(astronaut.map.spawn))}
     end
 
     function astronaut.update()
@@ -20,8 +22,6 @@ do
                     event.peer:send("HELLO:" .. tostring(astronaut.map.seed)) -- send necessary data
                 elseif type == "INITD" then -- initialization done
                     astronaut.initialized = true
-                    astronaut.velocity = {0, 0}
-                    astronaut.position = {0, -TILESIZE * 2}
                 end
             end
             event = astronaut.host:service()
@@ -50,13 +50,16 @@ do
                 vadd(astronaut.position, relBox[1]),
                 relBox[2]
             }
+            astronaut.wonky = false
             for y = colCheckRange[1][2], colCheckRange[2][2] do
                 for x = colCheckRange[1][1], colCheckRange[2][1] do
-                    local mtv = aabbCollision(colBox, {{(x-1)*TILESIZE, (y-1)*TILESIZE}, {TILESIZE, TILESIZE}})
-                    if mtv then
-                        astronaut.wonky = true
-                        --astronaut.position = vadd(astronaut.position, vmul(mtv, 1.01))
-                        --colBox[1] = vadd(astronaut.position, relBox[1])
+                    if astronaut.map[y][x] == TILE_INDICES.WALL then
+                        local mtv = aabbCollision(colBox, {{tileToWorld(x, y)}, {TILESIZE, TILESIZE}})
+                        if mtv then
+                            astronaut.wonky = true
+                            astronaut.position = vadd(astronaut.position, vmul(mtv, 1.01))
+                            colBox[1] = vadd(astronaut.position, relBox[1])
+                        end
                     end
                 end
             end
@@ -79,7 +82,7 @@ do
             camera.push()
                 drawMap(astronaut.map)
 
-                love.graphics.setColor(astronaut.wonky and {50, 0, 0} or {255, 255, 255, 255})
+                love.graphics.setColor(astronaut.wonky and {255, 0, 0} or {255, 255, 255, 255})
 
                 if astronaut.initialized then
                     love.graphics.draw(astronautImage, astronaut.position[1], astronaut.position[2], 0, 1.0, 1.0, astronautImage:getWidth()/2, astronautImage:getHeight()/2)

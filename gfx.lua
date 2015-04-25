@@ -22,7 +22,7 @@ function drawMap(map)
     for y = drawRange[1][2], drawRange[2][2] do
         for x = drawRange[1][1], drawRange[2][1] do
             if map[y][x] > 0 then
-                love.graphics.draw(tileSetImage, tileMap[map[y][x]], (x-1)*TILESIZE, (y-1)*TILESIZE)
+                love.graphics.draw(tileSetImage, tileMap[map[y][x]], tileToWorld(x, y))
             end
         end
     end

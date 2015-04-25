@@ -1,5 +1,5 @@
  do
-    camera = {targetX = 0.0, targetY = 0.0, targetZoom = 0.1, x = 0.0, y = 0.0, zoom = 1.0, scale = 1.0}
+    camera = {targetX = 0.0, targetY = 0.0, targetZoom = 0.2, x = 0.0, y = 0.0, zoom = 1.0, scale = 1.0}
 
     function camera.push()
         love.graphics.push()
