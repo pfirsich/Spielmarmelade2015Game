@@ -9,9 +9,12 @@ require "startscreen"
 require "utility"
 require "inputs"
 require "enet"
+require "camera"
+require "mapgen"
+require "gfx"
 
 function love.load()
-    astronautImage = love.graphics.newImage("media/images/survivor.png")
+    initGFX()
 
     setState(startscreen)
 end

@@ -48,3 +48,33 @@ function split(str, sep)
     end
     return ret
 end
+
+function clamp(v, lo, hi)
+    return math.max(math.min(v, hi), lo)
+end
+
+function intervalsOverlap(A, B) -- interval: {left, right}
+	-- they dont overlap if left_B > right_A or right_B < left_A
+	-- negate: left_B <= right_A and right_B >= left_A
+	return A[1] <= B[2] and B[1] <= A[2]
+end
+
+function aabbCollision(A, B) -- box: {{xleft, xright}, {yleft, yright}} (DAS WAR ES MAL. IS JETZT VORBEI)
+	-- returns the MTV (minimal translation vector to resolve the collision) for the shape A if there is a collision, otherwise nil
+    -- box = {{topleftx, toplefty}, {sizex, sizey}}
+	if  intervalsOverlap({A[1][1], A[1][1] + A[2][1]}, {B[1][1], B[1][1] + B[2][1]})
+    and intervalsOverlap({A[1][2], A[1][2] + A[2][2]}, {B[1][2], B[1][2] + B[2][2]}) then
+        return {0, 0}
+		
+	else
+		return nil
+	end
+end
+
+function worldToTiles(map, x, y)
+    return clamp(math.floor(x / TILESIZE) + 1, 1, map.width), clamp(math.floor(y / TILESIZE) + 1, 1, map.height)
+end
+
+function screenToTiles(map, x, y)
+    return worldToTiles(map, camera.screenToWorld(x, y))
+end
