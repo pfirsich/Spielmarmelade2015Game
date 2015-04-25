@@ -14,7 +14,9 @@ require "mapgen"
 require "gfx"
 
 function love.load()
+    spaceship.hudImage = love.graphics.newImage("media/images/ability_back.png")
     mouseLeftInput = watchBinaryInput(mouseButtonCallback("l"))
+    mouseRightInput = watchBinaryInput(mouseButtonCallback("r"))
     initGFX()
 
     setState(startscreen)
