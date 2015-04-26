@@ -32,7 +32,7 @@ end
         if getState() == astronaut then
             -- Astronaut
             if aabbCollision(astronaut.collisionBox, {{body.x-body.colSize, body.y-body.colSize}, {2*body.colSize, 2*body.colSize}}) then
-                deleteMe = true
+                -- deleteMe = true
                 astronaut.kill()
             end
             -- Level

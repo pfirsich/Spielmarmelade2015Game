@@ -23,7 +23,9 @@ function love.load()
     initGFX()
     abilities.load()
     astronaut.lives = 8
+    astronaut.safeRadius = TILESIZE * 5
     setState(startscreen)
+	lush.setPath("media/sounds/")
 end
 
 function love.update()
