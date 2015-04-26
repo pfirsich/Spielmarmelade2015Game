@@ -117,19 +117,14 @@ do
 
                             print("Placing trap because placement function returned true")
                             trapID = trapID + 1
-<<<<<<< HEAD
-                            abilities.placeTrap(spaceship.buttons[spaceship.selected].ability, mtx, mty, trapID)
-                            spaceship.astronautPeer:send("PLTRP:" .. tostring(trapID) .. ":" .. spaceship.buttons[spaceship.selected].ability.name .. ":" .. tostring(mtx) .. ":" .. tostring(mty))
-                            -- remove from hand 
-                            spaceship.abilities = spaceship.abilities - 1
-=======
+
                             abilities.placeTrap(spaceship.buttons[spaceship.selected].ability, mtx, mty, trapID, side)
                             spaceship.astronautPeer:send(   "PLTRP:" .. tostring(trapID) .. ":" ..
                                                             spaceship.buttons[spaceship.selected].ability.name .. ":" ..
                                                             tostring(mtx) .. ":" .. tostring(mty) .. ":" .. tostring(side))
                             -- remove from hand
-                            spaceship.abilitites = spaceship.abilities - 1
->>>>>>> 244a788326392fe6754b105b6d3df42564eb293e
+                            spaceship.abilities = spaceship.abilities - 1
+
                             for i = spaceship.selected, spaceship.abilities do
                                 spaceship.buttons[i].ability = spaceship.buttons[i+1].ability
                             end
