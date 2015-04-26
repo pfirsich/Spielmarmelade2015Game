@@ -34,16 +34,16 @@ do
             local accell = 75.0 * TILESIZE
             local frictionX = 0.075 * TILESIZE
             local frictionY = 0.01 * TILESIZE
-            local gravity = 45.0 * TILESIZE
+            local gravity = 25.0 * TILESIZE
             local ladderSpeed = 4.0 * TILESIZE
-            
+
             local tilex, tiley = worldToTiles(astronaut.map, astronaut.position[1], astronaut.position[2])
             local isOnLadder = (astronaut.map[tiley][tilex] == TILE_INDICES.LADDER)
             if isOnLadder == false then astronaut.onLadder = false end
 
             local move = (love.keyboard.isDown("d") and 1 or 0) - (love.keyboard.isDown("a") and 1 or 0)
             astronaut.velocity[1] = astronaut.velocity[1] + move * accell * simulationDt -- side movement
-            if astronaut.onLadder == false then 
+            if astronaut.onLadder == false then
                 astronaut.velocity[2] = astronaut.velocity[2] + gravity * simulationDt -- vertical gravity
                 if isOnLadder and love.keyboard.isDown("w") then astronaut.onLadder = true end
             else
@@ -54,7 +54,7 @@ do
             astronaut.velocity[2] = astronaut.velocity[2] - astronaut.velocity[2] * frictionY * simulationDt -- y friction
 
             if (astronaut.onGround or astronaut.onLadder) and spaceInput().pressed then
-                local jumpStrength = 18 * TILESIZE
+                local jumpStrength = 13.5 * TILESIZE
                 astronaut.velocity[2] = -jumpStrength
                 astronaut.onLadder = false
             end
@@ -98,28 +98,23 @@ do
                 end
             end
 
-            -- send updates
-            astronaut.spaceshipPeer:send("PLPOS:" .. tostring(astronaut.position[1]) .. ":" .. tostring(astronaut.position[2]))
-
-            -- update camera
             local mouseX, mouseY = camera.screenToWorld(love.mouse.getPosition())
             local camAimDist = TILESIZE * 1.5
             astronaut.aimDirection = vMaxLen(vsub({mouseX, mouseY}, astronaut.position), camAimDist)
 
+            -- send updates
+            astronaut.spaceshipPeer:send(   "PLPOS:" .. tostring(astronaut.position[1]) .. ":" .. tostring(astronaut.position[2]) .. ":" ..
+                                            tostring(astronaut.aimDirection[1]) .. ":" .. tostring(astronaut.aimDirection[2]))
+
+            -- update camera
             camera.targetX, camera.targetY = unpack(vadd(astronaut.position, astronaut.aimDirection))
             camera.update()
         end
     end
 
     function astronaut.draw()
-        if astronaut.spaceshipPeer then
-            camera.push()
-                drawMap(astronaut.map)
-
-                if astronaut.initialized then
-                    love.graphics.draw(astronautImage, astronaut.position[1], astronaut.position[2], 0, 1.0, 1.0, astronautImage:getWidth()/2, astronautImage:getHeight()/2)
-                end
-            camera.pop()
+        if astronaut.spaceshipPeer and astronaut.initialized then
+            drawGame()
             love.graphics.print("Astronaut", 0, 0)
         else
             love.graphics.print("Waiting for spaceship", 0, 0)

@@ -1,29 +1,29 @@
 do
     spaceship = {} -- (client)
-    
+
     spaceship.buttonScale = 1.0
     spaceship.buttons = {}
     spaceship.hovered = 0 -- which button is being hovered by the mouse
     spaceship.tooltip = ""
     spaceship.hudTop = 0
     spaceship.selected = 0
-    
+
     function spaceship.enter(fromState, ip)
         spaceship.host = enet.host_create()
         spaceship.server = spaceship.host:connect(ip .. ":" .. PORT)
-        
+
         -- Abilities
         spaceship.abilities = 13
-        
+
         spaceship.updateResolution()
     end
-    
-    
-    
-    
-    
+
+
+
+
+
     function spaceship.updateResolution()
-    
+
         -- Field Positions
         local dif = 14
         local size = (love.window.getWidth()-dif)/12
@@ -39,14 +39,14 @@ do
             if i == 12 then
                 x = dif
                 y = y - dif - spaceship.hudImage:getHeight()*scale
-            end 
+            end
         end
         spaceship.buttonScale = scale
         spaceship.hudTop = spaceship.buttons[24][1][2] - 8
     end
-    
-    
-    
+
+
+
 
     function spaceship.update()
         local event = spaceship.host:service()
@@ -63,21 +63,21 @@ do
                     spaceship.map = generateLevel(tonumber(vals[2]))
 
                     spaceship.initialized = true
-                    spaceship.astronaut = {
-                        position = {tileToWorld(unpack(spaceship.map.spawn))}
-                    }
-                    camera.targetX, camera.targetY = unpack(spaceship.astronaut.position)
+                    astronaut.position = {tileToWorld(unpack(spaceship.map.spawn))}
+                    astronaut.aimDirection = {0, 0}
+                    camera.targetX, camera.targetY = unpack(astronaut.position)
 
                     event.peer:send("INITD") -- initialization done
                 elseif type == "PLPOS" then
                     local vals = split(event.data, ":")
-                    spaceship.astronaut.position = {tonumber(vals[2]), tonumber(vals[3])}
+                    astronaut.position = {tonumber(vals[2]), tonumber(vals[3])}
+                    astronaut.aimDirection = {tonumber(vals[4]), tonumber(vals[5])}
                 end
             end
             event = spaceship.host:service()
         end
-        
-        
+
+
 
         if spaceship.astronautPeer and spaceship.initialized then -- game
             local mouseX, mouseY = love.mouse.getPosition()
@@ -87,9 +87,9 @@ do
             spaceship.handleButtons(mouseX, mouseY, mouseL)
             -- Scrolling
             local moveBorder = love.window.getHeight()*0.15
-            if mouseY >= spaceship.hudTop then 
+            if mouseY >= spaceship.hudTop then
                 moveBorder = 12
-            else 
+            else
                 -- not on HUD -> place tile?
                 if mouseL then
                     -- ...
@@ -107,7 +107,7 @@ do
             camera.update(1/simulationDt) -- move instantly
         end
     end
-    
+
     function spaceship.handleButtons(mx, my, mL)
         -- Reset
         spaceship.tooltip = ""
@@ -120,7 +120,7 @@ do
                 spaceship.tooltip = "A button is being hovered"
                 spaceship.hovered = i
                 -- Click
-                if mL then 
+                if mL then
                     spaceship.selected = i
                 end
             end
@@ -129,25 +129,22 @@ do
 
     function spaceship.draw()
         if spaceship.astronautPeer and spaceship.initialized then
-            camera.push()
-                drawMap(spaceship.map)
-
-                if spaceship.initialized then
-                    love.graphics.draw( astronautImage, spaceship.astronaut.position[1], spaceship.astronaut.position[2], 0, 1.0, 1.0,
-                                        astronautImage:getWidth()/2, astronautImage:getHeight()/2)
-                end
-
-            camera.pop()
-            
+            drawGame()
             spaceship.drawHUD()
-            
+
             love.graphics.print("Spaceship", 0, 0)
         else
             love.graphics.print("Connecting...", 0, 0)
         end
     end
-    
-    
+
+    function spaceship.keypressed(key)
+        if key == " " then
+            camera.targetX, camera.targetY = unpack(astronaut.position)
+        end
+    end
+
+
     function spaceship.drawHUD()
         -- Cycle through abilities
         local yoff = 0
@@ -167,12 +164,8 @@ do
         end
         love.graphics.setColor(255,255,255,255)
         -- Tooltip
-        if spaceship.tooltip ~= "" then 
+        if spaceship.tooltip ~= "" then
             love.graphics.print(spaceship.tooltip, love.window.getWidth()*0.5, 20)
         end
     end
 end
-
-
-
-
