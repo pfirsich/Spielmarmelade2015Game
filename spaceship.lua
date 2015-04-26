@@ -48,8 +48,6 @@ do
     end
 
 
-
-
     function spaceship.update()
         local event = spaceship.host:service()
         while event do
@@ -65,6 +63,7 @@ do
                     spaceship.map = generateLevel(tonumber(vals[2]))
 
                     spaceship.initialized = true
+                    astronaut.setupAnimations()
                     astronaut.position = {tileToWorld(unpack(spaceship.map.spawn))}
                     astronaut.aimDirection = {0, 0}
                     camera.targetX, camera.targetY = unpack(astronaut.position)
@@ -94,11 +93,11 @@ do
             else
                 -- not on HUD -> place tile?
                 if mouseL then
-                    if spaceship.selected > 0 then 
+                    if spaceship.selected > 0 then
                         -- place trap
                         local mtx, mty = worldToTiles(spaceship.map, mouseX, mouseY)
                         abilities.placeTrap(spaceship.buttons[spaceship.selected].ability, mtx, mty)
-                        -- remove from hand 
+                        -- remove from hand
                         spaceship.abilitites = spaceship.abilities - 1
                         for i = spaceship.selected, spaceship.abilities do
                             spaceship.buttons[i].ability = spaceship.buttons[i+1].ability
@@ -110,15 +109,17 @@ do
             -- Deselect
             if mouseR then spaceship.selected = 0 end
             -- TODO: mouse wheel zoom?
-            local camMoveSpeed = 1.8 * simulationDt * TILESIZE
-            if mouseX <= moveBorder then camera.targetX = camera.targetX - camMoveSpeed end
-            if mouseX >= love.window.getWidth() - moveBorder then camera.targetX = camera.targetX + camMoveSpeed end
-            if mouseY <= moveBorder then camera.targetY = camera.targetY - camMoveSpeed end
-            if mouseY >= love.window.getHeight() - moveBorder then camera.targetY = camera.targetY + camMoveSpeed end
-            
+            local camMoveSpeed = 3.2 * simulationDt * TILESIZE
+            local b2I = function(b) return b and 1 or 0 end
+            local moveX = b2I(mouseX >= love.window.getWidth() - moveBorder) + b2I(love.keyboard.isDown("d")) - b2I(mouseX <= moveBorder) - b2I(love.keyboard.isDown("a"))
+            local moveY = b2I(mouseY >= love.window.getHeight() - moveBorder) + b2I(love.keyboard.isDown("s")) - b2I(mouseY <= moveBorder) - b2I(love.keyboard.isDown("w"))
+            camera.targetX = camera.targetX + camMoveSpeed * moveX
+            camera.targetY = camera.targetY + camMoveSpeed * moveY
+
             traps.update()
 
             camera.update(1/simulationDt) -- move instantly
+            camera.scale = 0.4
         end
     end
 
@@ -143,7 +144,7 @@ do
 
     function spaceship.draw()
         if spaceship.astronautPeer and spaceship.initialized then
-            drawGame()
+            drawGame(true)
             spaceship.drawHUD()
 
             love.graphics.print("Spaceship", 0, 0)
