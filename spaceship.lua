@@ -123,12 +123,14 @@ do
 
                             print("Placing trap because placement function returned true")
                             trapID = trapID + 1
+
                             abilities.placeTrap(spaceship.buttons[spaceship.selected].ability, mtx, mty, trapID, side)
                             spaceship.astronautPeer:send(   "PLTRP:" .. tostring(trapID) .. ":" ..
                                                             spaceship.buttons[spaceship.selected].ability.name .. ":" ..
                                                             tostring(mtx) .. ":" .. tostring(mty) .. ":" .. tostring(side))
                             -- remove from hand
-                            spaceship.abilitites = spaceship.abilities - 1
+                            spaceship.abilities = spaceship.abilities - 1
+
                             for i = spaceship.selected, spaceship.abilities do
                                 spaceship.buttons[i].ability = spaceship.buttons[i+1].ability
                             end
@@ -172,6 +174,9 @@ do
             local moveY = b2I(mouseY >= love.window.getHeight() - moveBorder) + b2I(love.keyboard.isDown("s")) - b2I(mouseY <= moveBorder) - b2I(love.keyboard.isDown("w"))
             camera.targetX = camera.targetX + camMoveSpeed * moveX
             camera.targetY = camera.targetY + camMoveSpeed * moveY
+            
+            -- Bodies
+            bodies.update()
 
             camera.update(1/simulationDt) -- move instantly
             camera.scale = 0.4

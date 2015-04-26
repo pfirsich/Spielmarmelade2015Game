@@ -218,6 +218,8 @@ function drawGame(seeall)
             end
 
             drawAstronaut(astronaut.animations[astronaut.currentAnimation .. "_light"], astroHeadLight, {20, 0})
+            
+            bodies.drawLight()
 
             -- draw shadow volumes
             local vertices = {}
@@ -318,6 +320,7 @@ function drawGame(seeall)
     camera.push()
         drawMap(map)
         drawTraps(map)
+        bodies.draw()
 
         love.graphics.setColor(255, 255, 255, 255)
         drawAstronaut(astronaut.animations[astronaut.currentAnimation], astroHead)

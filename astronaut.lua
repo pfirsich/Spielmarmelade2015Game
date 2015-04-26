@@ -170,6 +170,7 @@ do
                 if love.keyboard.isDown("k") then astronaut.kill() end
 
                 traps.update()
+                bodies.update()
             else
                 astronaut.currentAnimation = "fall"
                 astronaut.animations.fall.time = 0.0
