@@ -1,16 +1,18 @@
  do
     camera = {targetX = 0.0, targetY = 0.0, targetZoom = 0.6, x = 0.0, y = 0.0, zoom = 1.0, scale = 1.0}
 
-    function camera.push()
+    function camera.push(scale)
+        scale = scale or 1.0
+
         love.graphics.push()
         -- Center Screen
-        love.graphics.translate(love.window.getWidth()/2, love.window.getHeight()/2)
+        love.graphics.translate(love.window.getWidth()/2*scale, love.window.getHeight()/2*scale)
         -- Here I swap scale and translate, so I can scale the translation myself and floor the values, to prevent sub-pixel-flickering around the edges
-        local tx = -math.floor(camera.x * camera.scale)
-        local ty = -math.floor(camera.y * camera.scale)
+        local tx = -math.floor(camera.x * camera.scale * scale)
+        local ty = -math.floor(camera.y * camera.scale * scale)
         love.graphics.translate(tx, ty)
         -- FIXME: flickering on edges caused by pixel positions not being whole numbers after scaling (see math.floor in translate). ?
-        love.graphics.scale(camera.scale, camera.scale)
+        love.graphics.scale(camera.scale*scale, camera.scale*scale)
     end
 
     function camera.screenToWorld(x, y)

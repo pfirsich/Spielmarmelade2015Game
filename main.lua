@@ -36,6 +36,7 @@ function love.textinput(text)
 end
 
 function love.draw()
+    love.graphics.setColor(255, 255, 255, 255)
     if getState().draw then getState().draw() end
 end
 
