@@ -111,9 +111,9 @@ do
         else
             steps = rand(3, 10)
         end
-        local offL = rand(1,2)
-        local offR = rand(0,1)
-        local requiresLadder = (vertical and steps > 2)
+        local offL = 1 --rand(1,2)
+        local offR = 0 --rand(0,1)
+        local requiresLadder = (vertical and steps >= 2)
         --if dir[2] > 0 and rand(1,3) == 1 then requiresLadder = false end
 
         -- Step loop
