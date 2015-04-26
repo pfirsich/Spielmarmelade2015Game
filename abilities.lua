@@ -204,6 +204,7 @@ do
             local trg = traps.getTrapAtPoint(tx, ty)
             if trg then
                 trg.hidden = true
+                print("Applying camouflage on " .. trg.tp.name)
             end
         end
 
