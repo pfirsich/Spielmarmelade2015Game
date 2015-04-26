@@ -36,6 +36,7 @@ function initGFX()
     astroIdle = love.graphics.newImage("media/images/idlesprite.png")
     astroJump = love.graphics.newImage("media/images/jumpingsprite.png")
 
+    exitLight = love.graphics.newImage("media/images/light_exit.png")
     astroHeadLight = love.graphics.newImage("media/images/light_head.png")
     astroWalkLight = love.graphics.newImage("media/images/light_walkingsprite.png")
     astroFallLight = love.graphics.newImage("media/images/light_fallingsprite.png")
@@ -85,9 +86,13 @@ function initGFX()
 
     composeShader = love.graphics.newShader([[
     uniform Image lightMap;
+    uniform Image noiseMap;
+    uniform vec2 noiseOffset;
+
 
     vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
-        return vec4(Texel(texture, texture_coords).rgb * Texel(lightMap, texture_coords).rgb * 2.2, 1.0);
+        vec3 col = mix(Texel(noiseMap, texture_coords + noiseOffset).rgb, Texel(texture, texture_coords).rgb * Texel(lightMap, texture_coords).rgb * 2.2, vec3(0.95));
+        return vec4(col, 1.0);
     }
     ]])
 
@@ -104,6 +109,18 @@ function initGFX()
 end
 
 function reinitGFX()
+    filmGrainScale = 2.0
+    local grainData = love.image.newImageData(love.window.getWidth()/filmGrainScale, love.window.getHeight()/filmGrainScale)
+    for y = 0, love.window.getHeight()/filmGrainScale - 1 do
+        for x = 0, love.window.getWidth()/filmGrainScale - 1 do
+            local col = love.math.random(1, 255)
+            grainData:setPixel(x, y, col, col, col, 255)
+        end
+    end
+    filmGrainImage = love.graphics.newImage(grainData)
+    filmGrainImage:setWrap("repeat", "repeat")
+
+
     albedoCanvas = love.graphics.newCanvas()
     lightMap = love.graphics.newCanvas(love.window.getWidth()/lightMapScale, love.window.getHeight()/lightMapScale)
     lightMapPong = love.graphics.newCanvas(love.window.getWidth()/lightMapScale, love.window.getHeight()/lightMapScale)
@@ -175,9 +192,10 @@ function drawGame(seeall)
 
             love.graphics.setColor(255, 100, 100, 255)
 
+            local lightDrawPadding = 2.5
             drawRange = {
-                {screenToTiles(map, -love.window.getWidth(), -love.window.getHeight())},
-                {screenToTiles(map, love.window.getWidth()*2, love.window.getHeight()*2)}
+                {screenToTiles(map, -love.window.getWidth()*lightDrawPadding, -love.window.getHeight()*lightDrawPadding)},
+                {screenToTiles(map, (1+lightDrawPadding)*love.window.getWidth(), (1+lightDrawPadding)*love.window.getHeight())}
             }
 
             for y = drawRange[1][2], drawRange[2][2] do
@@ -189,9 +207,13 @@ function drawGame(seeall)
                         posY = posY + TILESIZE
                         love.graphics.draw( spotlightImage, posX, posY, math.pi/2.0, math.min(map.mapMeta[y][x].lightHeight, 10), scale, 0.0, headlightImage:getHeight()*0.5)
                     end
+
+                    if map[y][x] == TILE_INDICES.GOAL then
+                        local px, py = tileToWorld(x, y)
+                        love.graphics.draw(exitLight, px - TILESIZE, py)
+                    end
                 end
             end
-
 
             drawAstronaut(astronaut.animations[astronaut.currentAnimation .. "_light"], astroHeadLight, {20, 0})
 
@@ -305,6 +327,8 @@ function drawGame(seeall)
         love.graphics.setColor(255, 255, 255, 255)
         love.graphics.setShader(composeShader)
         composeShader:send("lightMap", lightMap)
+        composeShader:send("noiseMap", filmGrainImage)
+        composeShader:send("noiseOffset", {love.math.random(), love.math.random()})
         love.graphics.draw(albedoCanvas)
     end
 
@@ -332,10 +356,10 @@ function drawTraps(map)
     local img = 0
     for t = 1, trapCount do
         local trap = traps[t]
-        if getState() == astronaut then 
-            img = trap.hidden and 0 or trap.tp.ingameImage 
-        else 
-            img = trap.tp.image 
+        if getState() == astronaut then
+            img = trap.hidden and 0 or trap.tp.ingameImage
+        else
+            img = trap.tp.image
         end
         if img then
             if trap.tx >= drawRange[1][1] and trap.tx <= drawRange[2][1] then

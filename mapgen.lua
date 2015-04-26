@@ -2,7 +2,7 @@ do
     TILE_INDICES = {
         FREE = 0,
         WALL = 1,
-        SPAWN = 4,
+        SPAWN = 8,
         GOAL = 4,
         WATER = 5,
         OIL = 6,
@@ -14,6 +14,23 @@ do
 
     local rand = love.math.random
     local setSeed = love.math.setRandomSeed
+
+    function findFarthest(level, sx, sy)
+        local farthestX, farthestY = nil, nil
+        local farthestDist = 0
+        for y = 3, level.height - 2 do
+            for x = 3, level.width - 2 do
+                if level[y][x] == TILE_INDICES.FREE then
+                    local dist = (x-sx)*(x-sx) + (y-sy)*(y-sy)
+                    if dist > farthestDist then
+                        farthestDist = dist
+                        farthestX, farthestY = x, y
+                    end
+                end
+            end
+        end
+        return farthestX, farthestY
+    end
 
     function generateLevel(seed)
         -- Randomization
@@ -42,8 +59,15 @@ do
         generateBranch(level, midx, midy, 4, rand(1,4)) -- left
 
         -- Spawn Point
-        generateCave(level, midx, midy)
-        level.spawn = {midx, midy}
+        level.spawn = {findFarthest(level, midx, midy)}
+        generateCave(level, unpack(level.spawn))
+
+        -- GOAL
+        local goalX, goalY = findFarthest(level, unpack(level.spawn))
+        level[goalY][goalX] = TILE_INDICES.GOAL
+
+        print(unpack(level.spawn))
+        print(goalX, goalY)
 
         refineLevel(level)
 
@@ -93,13 +117,11 @@ do
     function generateBranch(level, x, y, direction, childs)
         local dirs = {{0,1}, {-1,0}, {0,-1}, {1,0}}
         local dir = dirs[direction]
-        local segments = rand(10,20)
+        local segments = rand(5,10)
         local branchSegment = 0
-        local containsGoal = false
         if childs > 0 then
-            branchSegment = rand(3, segments-3)
+            branchSegment = rand(3, segments-2)
             childs = childs - 1
-            if childs < 1 then containsGoal = true end
         end
 
         -- Cycle through segments
@@ -121,11 +143,6 @@ do
                 generateBranch(level, x, y, rand(1,4), childs)
             end
         end
-
-        -- Set Goal
-        if containsGoal then
-            level[y][x] = TILE_INDICES.GOAL
-        end
     end
 
     function generateSegment(level, x, y, dir)
@@ -134,7 +151,7 @@ do
         if vertical then
             steps = rand(2, rand(4,9))
         else
-            steps = rand(7, 14)
+            steps = rand(4, 9)
         end
         local offL = 1 --rand(1,2)
         local offR = vertical and 1 or 0 --rand(0,1)
@@ -179,7 +196,7 @@ do
                 level[y][x] = TILE_INDICES.LADDER
             end
             -- Change offset
-            if vertical then 
+            if vertical then
                 if rand(1,8)==1 then offL = rand(1,2) end
             else
                 if rand(1,8)==1 then offL = rand(0,1) end
