@@ -11,8 +11,8 @@ do
 
     function startscreen.draw()
         love.graphics.print("--- Choose mode ---\nPress 'H' to host a game (be the astronaut) or 'C' to connect to a game.", 0, 0)
-        love.graphics.print("IP (X.X.X.X): " .. startscreen.ip, 0, 40)
-        if startscreen.message then love.graphics.print(startscreen.message, 0, 55) end
+        love.graphics.print("IP (X.X.X.X): " .. startscreen.ip, 0, 60)
+        if startscreen.message then love.graphics.print(startscreen.message, 0, 80) end
     end
 
     function startscreen.keypressed(key)

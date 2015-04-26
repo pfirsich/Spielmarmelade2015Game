@@ -107,11 +107,21 @@ do
                     if spaceship.selected > 0 then
                         -- place trap
                         if spaceship.buttons[spaceship.selected].ability.placementFunction(mtx, mty) then
+                            local localMouseX, localMouseY = camera.screenToWorld(mouseX, mouseY)
+                            localMouseX, localMouseY = localMouseX - (mtx - 0.5) * TILESIZE, localMouseY - (mty - 0.5) * TILESIZE
+                            local localMouseAngle = vangle({localMouseX, localMouseY})
+                            if math.abs(localMouseAngle) <= math.pi / 4.0 then side = 0 end
+                            if localMouseAngle >=  math.pi/4.0 and localMouseAngle <=  math.pi/4.0 + math.pi/2.0 then side = 1 end
+                            if localMouseAngle <= -math.pi/4.0 and localMouseAngle >= -math.pi/4.0 - math.pi/2.0 then side = 3 end
+                            if math.abs(localMouseAngle) >= math.pi/4.0 + math.pi/2.0 then side = 2 end
+
                             print("Placing trap because placement function returned true")
                             trapID = trapID + 1
-                            abilities.placeTrap(spaceship.buttons[spaceship.selected].ability, mtx, mty, trapID)
-                            spaceship.astronautPeer:send("PLTRP:" .. tostring(trapID) .. ":" .. spaceship.buttons[spaceship.selected].ability.name .. ":" .. tostring(mtx) .. ":" .. tostring(mty))
-                            -- remove from hand 
+                            abilities.placeTrap(spaceship.buttons[spaceship.selected].ability, mtx, mty, trapID, side)
+                            spaceship.astronautPeer:send(   "PLTRP:" .. tostring(trapID) .. ":" ..
+                                                            spaceship.buttons[spaceship.selected].ability.name .. ":" ..
+                                                            tostring(mtx) .. ":" .. tostring(mty) .. ":" .. tostring(side))
+                            -- remove from hand
                             spaceship.abilitites = spaceship.abilities - 1
                             for i = spaceship.selected, spaceship.abilities do
                                 spaceship.buttons[i].ability = spaceship.buttons[i+1].ability
@@ -186,7 +196,7 @@ do
             drawGame(true)
             spaceship.drawHUD()
 
-            love.graphics.print("Spaceship", 0, 0)
+            love.graphics.print("Lives: " .. tostring(astronaut.lives), 0, 0)
         else
             love.graphics.print("Connecting...", 0, 0)
         end
@@ -225,7 +235,7 @@ do
         end
         -- Tooltip
         if spaceship.tooltip ~= "" then
-            love.graphics.print(spaceship.tooltip, love.window.getWidth()*0.5, 20)
+            love.graphics.print(spaceship.tooltip, love.window.getWidth()/2 - love.graphics.getFont():getWidth(spaceship.tooltip)/2, 20)
         end
     end
 end

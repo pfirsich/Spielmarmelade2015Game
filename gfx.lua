@@ -105,6 +105,8 @@ function initGFX()
         end
     end
 
+    love.graphics.setFont(love.graphics.newFont(24))
+
     reinitGFX()
 end
 
@@ -358,10 +360,10 @@ function drawTraps(map)
         local trap = traps[t]
         if trap.tx >= drawRange[1][1] and trap.tx <= drawRange[2][1] then
             if trap.ty >= drawRange[1][2] and trap.ty <= drawRange[2][2] then
-                if getState() == astronaut then 
+                if getState() == astronaut then
                     if trap.hidden then img = false else img = trap.tp.ingameImage end
-                else 
-                    img = trap.tp.image 
+                else
+                    img = trap.tp.image
                 end
                 if img ~= false then
                     local tempx, tempy = tileToWorld(trap.tx+0.5, trap.ty+0.5)
