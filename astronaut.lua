@@ -189,7 +189,7 @@ do
                 end
 
                 if astronaut.currentAnimation == "idle" and astronaut.passedFrame(3, timeDir) then
-                    lush.play("breath.mp3", {tags= {"astronaut", "breath"}, volume = 0.01})
+                    lush.play("breath.wav", {tags= {"astronaut", "breath"}, volume = 0.035})
                 end
 
                 if not astronaut.lastOnGround and astronaut.onGround then
@@ -200,6 +200,7 @@ do
                 astronaut.lastOnGround = astronaut.onGround
 
                 astronaut.animations[astronaut.currentAnimation].time = astronaut.animations[astronaut.currentAnimation].time + simulationDt * timeDir
+                astronaut.animations[astronaut.currentAnimation .. "_light"].time = astronaut.animations[astronaut.currentAnimation].time
 
                 if love.keyboard.isDown("k") then astronaut.kill() end
 
