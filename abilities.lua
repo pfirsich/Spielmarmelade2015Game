@@ -17,25 +17,27 @@ do
     function abilities.load() 
         -- Load all abilities
         -- Sensors
-        abilities.add("Weight Sensor", "weight.png", "Triggers when weight stands on the sensor", 1, true, sensors.checkWeight, false, nil, placement_freeWall)
-        abilities.add("Movement Sensor", "move.png", "Triggers when something moves in its line of sight", 1, true, sensors.checkMovement, false, nil, placement_freeWall)
+        abilities.add("Weight Sensor", "weight.png", false, "Triggers when weight stands on the sensor", 1, true, sensors.checkWeight, false, nil, placement_freeWall)
+        abilities.add("Movement Sensor", "move.png", false, "Triggers when something moves in its line of sight", 1, true, sensors.checkMovement, false, nil, placement_freeWall)
         -- Actors
-        abilities.add("Stomp", "stomp.png", "Crushes whatever is underneath when triggered", 3, true, false, false, actors.stomp, placement_wall)
-        abilities.add("Vanishing Block", "vanish.png", "Vanishes when triggered", 2, true, false, false, actors.vanish, placement_wall)
+        abilities.add("Stomp", "stomp.png", true, "Crushes whatever is underneath when triggered", 3, true, false, false, actors.stomp, placement_wall)
+        abilities.add("Vanishing Block", "vanish.png", true, "Vanishes when triggered", 2, true, false, false, actors.vanish, placement_wall)
         -- abilities.add("Timer", "timer.png", "Waits for 3 seconds after being triggered before triggering itself", 1, true, false, false, actors.timer)
-        abilities.add("Fake", "fake.png", "Pretends to be a sensor/trap, but doesn't do anything", 1, true, false, false, nil, placement_free)
-        abilities.add("Spikes", "spikes.png", "Deathly Spikes coming out of the ground", 2, true, false, false, actors.spikes, placement_freeWall)
+        abilities.add("Fake", "fake.png", false, "Pretends to be a sensor/trap, but doesn't do anything", 1, true, false, false, nil, placement_free)
+        abilities.add("Spikes", "spikes.png", false, "Deathly Spikes coming out of the ground", 2, true, false, false, actors.spikes, placement_freeWall)
+        abilities.add("Bullet", "bullet.png", true, "Deathly Bullet destroying nasty astronauts", 2, true, false, false, actors.bullet, placement_freeWall)
         -- Buffs
-        abilities.add("Camouflage", "camouflage.png", "Hides a trap from being seen", 2, true, false, actors.camouflage, nil, placement_trap)
+        abilities.add("Camouflage", "camouflage.png", true, "Hides a trap from being seen", 2, true, false, actors.camouflage, nil, placement_trap)
         -- Survival
-        abilities.add("Teleport", "teleport.png", "Teleports you to a nearby position", 1, false, false, false, nil, nil)
+        abilities.add("Teleport", "teleport.png", false, "Teleports you to a nearby position", 1, false, false, false, nil, nil)
     end
     
-    function abilities.add(name, image, tooltip, cost, forAI, sensorFunc, buffFunc, triggerFunc, placementFunc)
+    function abilities.add(name, image, hiddenByDefault, tooltip, cost, forAI, sensorFunc, buffFunc, triggerFunc, placementFunc)
         abilityCount = abilityCount + 1
         abilities[abilityCount] = {name = name, 
             image = love.graphics.newImage("media/images/ability/" .. image), 
             ingameImage = false, 
+            hidden = hiddenByDefault,
             tooltip = tooltip, 
             cost = cost, 
             forAI = forAI, 
@@ -94,7 +96,7 @@ do
     function abilities.placeTrap(ability, tx, ty, id) 
         if not ability.isBuff then
             trapCount = trapCount + 1
-            traps[trapCount] = {tp = ability, id = id, tx = tx, ty = ty, active = true, hidden = false, trgx = tx, trgy = ty, param = 0, angle = 0}
+            traps[trapCount] = {tp = ability, id = id, tx = tx, ty = ty, active = true, hidden = ability.hidden, trgx = tx, trgy = ty, param = 0, angle = 0}
             print("Trap " .. ability.name .. " created at tile " .. tx .. "," .. ty)
             -- Fake
             if ability.name == "Fake" then
@@ -208,7 +210,8 @@ do
 
         
         function actors.stomp(trap)
-            -- ...
+            local tile = getState().map.mapMeta[trap.ty][trap.tx].tile
+            spawnBody(tileSetImage, tileMap[tile], trap.tx+0.5, trap.ty+0.5, 180.0, 500.0, 0)
         end
         
         function actors.vanish(trap)
@@ -226,6 +229,10 @@ do
         
         function actors.spikes(trap)
             -- ...
+        end
+        
+        function actors.bullet(trap)        
+            spawnBody(trap.tp.ingameImage, 0, trap.tx+0.5, trap.ty+0.5, trap.angle, 800.0, trap.angle + math.pi*0.5)
         end
         
         function actors.camouflage(ability, tx, ty)

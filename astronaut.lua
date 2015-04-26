@@ -171,6 +171,7 @@ do
                                             astronaut.currentAnimation .. ":" .. tostring(astronaut.animations[astronaut.currentAnimation].time) .. ":" ..
                                             tostring(astronaut.flipped), 0, "unsequenced")
 
+            bodies.update()
             traps.update()
 
             -- update camera
