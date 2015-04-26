@@ -49,7 +49,9 @@ do
                 astronaut.velocity[2] = astronaut.velocity[2] + gravity * simulationDt -- vertical gravity
                 if isOnLadder and love.keyboard.isDown("w") then astronaut.onLadder = true end
             else
-                local moveUp = (love.keyboard.isDown("s") and 1 or 0) - (love.keyboard.isDown("w") and 1 or 0)
+                local moveUp = (love.keyboard.isDown("s") and 1 or 0) - (love.keyboard.isDown("w") and 1 or 0) -- move up/down
+                local tempx, tempy = worldToTiles(astronaut.map, astronaut.position[1], astronaut.position[2]-20) -- check if on top of ladder
+                if moveUp < 0 and (astronaut.map[tempy][tempx] ~= TILE_INDICES.LADDER) then moveUp = 0.0 end -- if so, don't move up
                 astronaut.velocity[2] = ladderSpeed * moveUp
             end
             astronaut.velocity[1] = astronaut.velocity[1] - astronaut.velocity[1] * frictionX * simulationDt -- x friction
