@@ -42,9 +42,10 @@ do
         astronaut.position = vadd({tileToWorld(unpack(astronaut.map.spawn))}, vmul({1,1}, TILESIZE/2))
         spaceInput = watchBinaryInput(keyboardCallback(" "))
         astronaut.onLadder = false
+		astronaut.lastOnGround = false
         astronaut.setupAnimations()
-		lush.play("ambience.mp3", {tags = {"astronaut", "ambience", "music"}, looping = true})
-		lush.play("breath.wav", {tags= {"astronaut", "breath"}, looping = true, volume = 0.05})
+		lush.play("ambience.mp3", {tags = {"astronaut", "ambience"}, looping = true, volume = 0.5})
+		lush.play("engine.mp3", {tags = {"astronaut", "ambience", "engine"}, looping = true, volume = 0.3})
     end
 	
 	function astronaut.passedFrame(number, timeDir)
@@ -181,9 +182,19 @@ do
 			
 			
 			if astronaut.currentAnimation == "walk" and (astronaut.passedFrame(2, timeDir) or astronaut.passedFrame(27, timeDir)) then
-				lush.play("steps.wav", {tags={"astronaut", "steps"}})
+				lush.play("steps.mp3", {tags={"astronaut", "steps"}, volume=0.7})
 			end
+			
+			if astronaut.currentAnimation == "idle" and astronaut.passedFrame(3, timeDir) then
+				lush.play("breath.mp3", {tags= {"astronaut", "breath"}, volume = 0.05})
+			end
+			
+			if not astronaut.lastOnGround and astronaut.onGround then
+				lush.play("land.mp3", {tags={"astronaut", "steps"}, volume=0.7})
+			end
+			
 			astronaut.lastFrame = animFrame(astronaut.animations[astronaut.currentAnimation])
+			astronaut.lastOnGround = astronaut.onGround
 			
             -- send updates
             astronaut.spaceshipPeer:send(   "PLPOS:" .. tostring(astronaut.position[1]) .. ":" .. tostring(astronaut.position[2]) .. ":" ..
