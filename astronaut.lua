@@ -32,7 +32,7 @@ do
     end
 
     function astronaut.enter()
-        astronaut.host = enet.host_create("localhost:" .. PORT)
+        astronaut.host = enet.host_create("*:" .. PORT)
         if astronaut.host == nil then error("Host is nil.") end
         astronaut.map = generateLevel(love.math.random(1, 10000000))
         print("Seed:", astronaut.map.seed)
@@ -143,7 +143,7 @@ do
 
                     return nil
                 end
-            
+
 
                 astronaut.onGround = false
                 local delta = vmul(astronaut.velocity, simulationDt)
