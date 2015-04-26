@@ -76,6 +76,9 @@ do
                     local vals = split(event.data, ":")
                     astronaut.position = {tonumber(vals[2]), tonumber(vals[3])}
                     astronaut.aimDirection = {tonumber(vals[4]), tonumber(vals[5])}
+                    astronaut.currentAnimation = vals[6]
+                    astronaut.animations[astronaut.currentAnimation].time = tonumber(vals[7])
+                    astronaut.flipped = vals[8] == "true"
                 elseif type == "TRTRG" then
                     local vals = split(event.data, ":")
                     local trap = traps.getFromID(vals[2])
