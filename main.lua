@@ -22,6 +22,7 @@ function love.load()
     initGFX()
     abilities.load()
     setState(startscreen)
+	lush.setPath("media/sounds/")
 end
 
 function love.update()

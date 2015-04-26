@@ -29,6 +29,8 @@ do
         astronaut.animations.fall_light.image = astroFallLight
         astronaut.animations.jump_light.image = astroJumpLight
         astronaut.animations.walk_light.image = astroWalkLight
+		
+		astronaut.lastFrame = 0
     end
 
     function astronaut.enter()
@@ -41,7 +43,18 @@ do
         spaceInput = watchBinaryInput(keyboardCallback(" "))
         astronaut.onLadder = false
         astronaut.setupAnimations()
+		lush.play("ambience.mp3", {tags = {"astronaut", "ambience", "music"}, looping = true})
+		lush.play("breath.wav", {tags= {"astronaut", "breath"}, looping = true, volume = 0.05})
     end
+	
+	function astronaut.passedFrame(number, timeDir)
+		local frame = animFrame(astronaut.animations[astronaut.currentAnimation])
+		if timeDir > 0 then
+			return ((frame >= number) and (astronaut.lastFrame < number))
+		else
+			return ((frame <= number) and (astronaut.lastFrame > number))
+		end
+	end
 
     function astronaut.update()
         local event = astronaut.host:service()
@@ -164,7 +177,14 @@ do
             local timeDir = 1.0
             if astronaut.currentAnimation == "walk" and astronaut.velocity[1] * astronaut.aimDirection[1] < 0.0 then timeDir = -1.0 end
             astronaut.animations[astronaut.currentAnimation].time = astronaut.animations[astronaut.currentAnimation].time + simulationDt * timeDir
-
+			
+			
+			
+			if astronaut.currentAnimation == "walk" and (astronaut.passedFrame(2, timeDir) or astronaut.passedFrame(27, timeDir)) then
+				lush.play("steps.wav", {tags={"astronaut", "steps"}})
+			end
+			astronaut.lastFrame = animFrame(astronaut.animations[astronaut.currentAnimation])
+			
             -- send updates
             astronaut.spaceshipPeer:send(   "PLPOS:" .. tostring(astronaut.position[1]) .. ":" .. tostring(astronaut.position[2]) .. ":" ..
                                             tostring(astronaut.aimDirection[1]) .. ":" .. tostring(astronaut.aimDirection[2]) .. ":" ..
