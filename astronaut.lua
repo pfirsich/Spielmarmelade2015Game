@@ -19,6 +19,16 @@ do
 
         astronaut.animations.fall.speed = 100.0
         astronaut.animations.jump.speed = 200.0
+
+        astronaut.animations.idle_light = copyTable(astronaut.animations.idle)
+        astronaut.animations.fall_light = copyTable(astronaut.animations.fall)
+        astronaut.animations.jump_light = copyTable(astronaut.animations.jump)
+        astronaut.animations.walk_light = copyTable(astronaut.animations.walk)
+
+        astronaut.animations.idle_light.image = astroIdleLight
+        astronaut.animations.fall_light.image = astroFallLight
+        astronaut.animations.jump_light.image = astroJumpLight
+        astronaut.animations.walk_light.image = astroWalkLight
     end
 
     function astronaut.enter()
