@@ -47,8 +47,15 @@ do
             for x = 1, level.width do
                 level.mapMeta[y][x] = {
                     tile = love.math.random(1, 2) + (love.math.random() < 0.5 and 1 or 0) * 4,
-                    color = love.math.random(190, 255)
+                    color = love.math.random(190, 255),
                 }
+
+                if y < level.height and level[y][x] == TILE_INDICES.WALL and level[y+1][x] ~= TILE_INDICES.WALL and math.random() < 0.2 then
+                    level.mapMeta[y][x].light = true
+                    local cur = y+1
+                    while level[cur][x] ~= TILE_INDICES.WALL do cur = cur + 1 end
+                    level.mapMeta[y][x].lightHeight = (cur - y) / 10.0
+                end
             end
         end
 

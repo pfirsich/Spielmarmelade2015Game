@@ -113,16 +113,12 @@ function drawGame()
         lightMap:clear(ambient, ambient, ambient, 255)
         love.graphics.setBlendMode("additive")
         local headLightScale = 0.9
+        love.graphics.setColor(255, 255, 255, 150)
         love.graphics.draw( headlightImage, astronaut.position[1], astronaut.position[2] - astronautImage:getHeight()*0.3,
                             vangle(astronaut.aimDirection), headLightScale, headLightScale, 0.0, headlightImage:getHeight()*0.5)
 
         -- draw shadow volumes
         local vertices = {}
-
-        local drawRange = {
-            {screenToTiles(map, 0, 0)},
-            {screenToTiles(map, love.window.getWidth(), love.window.getHeight())}
-        }
 
         local aimDir = vnormed(astronaut.aimDirection)
 
@@ -137,6 +133,11 @@ function drawGame()
                     extrudeShadowEdge(vertices, from, to, astronaut.position)
             end
         end
+
+        local drawRange = {
+            {screenToTiles(map, 0, 0)},
+            {screenToTiles(map, love.window.getWidth(), love.window.getHeight())}
+        }
 
         for y = drawRange[1][2], drawRange[2][2] do
             for x = drawRange[1][1], drawRange[2][1] do
@@ -157,6 +158,25 @@ function drawGame()
 
             shadowMesh:setVertices(vertices)
             love.graphics.draw(shadowMesh)
+        end
+
+        love.graphics.setBlendMode("additive")
+        love.graphics.setColor(255, 255, 255, 60)
+
+        drawRange = {
+            {screenToTiles(map, -love.window.getWidth(), -love.window.getHeight())},
+            {screenToTiles(map, love.window.getWidth()*2, love.window.getHeight()*2)}
+        }
+
+        for y = drawRange[1][2], drawRange[2][2] do
+            for x = drawRange[1][1], drawRange[2][1] do
+                if map.mapMeta[y][x].light then
+                    local scale = 0.4
+                    local posX, posY = tileToWorld(x, y)
+                    posY = posY + TILESIZE
+                    love.graphics.draw( headlightImage, posX, posY, math.pi/2.0, map.mapMeta[y][x].lightHeight, scale, 0.0, headlightImage:getHeight()*0.5)
+                end
+            end
         end
     camera.pop()
 
