@@ -30,5 +30,5 @@ Joel Schumacher (http://theshoemaker.de/) - programming
 (VIDEO) (Spaceship)
 (VIDEO) (Astronaut)
 
-Screenshot A
-Screenshot B
+![Screenshot of astronaut player](https://raw.githubusercontent.com/pfirsich/TerminationShock/master/media/termshock_astro.png)
+![Screenshot of spaceship player](https://raw.githubusercontent.com/pfirsich/TerminationShock/master/media/termshock_ship.png)
