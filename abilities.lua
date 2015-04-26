@@ -35,7 +35,7 @@ do
         abilityCount = abilityCount + 1
         abilities[abilityCount] = {name = name, 
             image = love.graphics.newImage("media/images/ability/" .. image), 
-            ingameImage = nil, 
+            ingameImage = false, 
             tooltip = tooltip, 
             cost = cost, 
             forAI = forAI, 
@@ -94,8 +94,25 @@ do
     function abilities.placeTrap(ability, tx, ty, id) 
         if not ability.isBuff then
             trapCount = trapCount + 1
-            traps[trapCount] = {tp = ability, id = id, tx = tx, ty = ty, active = true, hidden = false, trgx = tx, trgy = ty, param = 0}
+            traps[trapCount] = {tp = ability, id = id, tx = tx, ty = ty, active = true, hidden = false, trgx = tx, trgy = ty, param = 0, angle = 0}
             print("Trap " .. ability.name .. " created at tile " .. tx .. "," .. ty)
+            -- Fake
+            if ability.name == "Fake" then
+                repeat
+                    traps[trapCount].param = love.math.random(1,abilityCount)
+                until abilities[traps[trapCount].param].ingameImage ~= false
+            end
+            -- Movement Sensor needs Direction
+            if ability.name == "Movement Sensor" or ability.name == "Spikes" then
+                local map = astronaut.map
+                if map == nil then map = spaceship.map end
+                if map[ty+1][tx] then traps[trapCount].param = 0 end
+                if map[ty][tx-1] then traps[trapCount].param = 1 end
+                if map[ty-1][tx] then traps[trapCount].param = 2 end
+                if map[ty][tx+1] then traps[trapCount].param = 3 end
+                traps[trapCount].angle = math.pi*0.5*traps[trapCount].param + math.pi
+            end
+            -- Spikes need Direction
         else
             -- Buff
             print("Creating Buff " .. ability.name .. " at " .. tx .. "," .. ty)
@@ -137,9 +154,13 @@ do
     end
     
         function traps.trigger(tx,ty) 
+            print("Triggering at " .. tx .. "," .. ty)
             for t = 1, trapCount do
+                print("Checking " .. traps[t].tp.name .. " at " .. traps[t].tx .. "," .. traps[t].ty)
                 if traps[t].tx == tx and traps[t].ty == ty then
-                    if traps[t].active and traps[t].isSensor == false then
+                    print("Found type " .. traps[t].tp.name .. " at position. Active: " .. tostring(traps[t].active)) -- .. ", sensor: " .. traps[t].tp.isSensor)
+                    if traps[t].active and not traps[t].tp.isSensor then
+                        print("Triggering!")
                         traps.actuallyTrigger(traps[t])
                     end
                 end
@@ -147,6 +168,7 @@ do
         end
     
         function traps.actuallyTrigger(trap)
+            print("Triggering trap of type " .. trap.tp.name)
             -- Deactivate after use
             trap.active = false
             -- send over network
@@ -179,8 +201,9 @@ do
         end
         
         function sensors.trigger(sensor)
+            print("Triggering sensor of type " .. sensor.tp.name .. " at " .. sensor.tx .. "," .. sensor.ty .. " -> " .. sensor.trgx .. "," .. sensor.trgy)
             traps.trigger(sensor.trgx, sensor.trgy)
-            print("Triggering sensor of type " .. sensor.tp.name)
+            sensor.active = false
         end
 
         
@@ -189,7 +212,12 @@ do
         end
         
         function actors.vanish(trap)
-            astronaut.map[trap.ty][trap.tx] = TILE_INDICES.FREE
+            print("Vanishing block at " .. trap.tx .. "," .. trap.ty)
+            if getState() == astronaut then 
+                astronaut.map[trap.ty][trap.tx] = TILE_INDICES.FREE
+            else
+                spaceship.map[trap.ty][trap.tx] = TILE_INDICES.FREE
+            end
         end
         
         function actors.timer(trap)
