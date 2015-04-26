@@ -141,7 +141,7 @@ do
                     colCheckRange[2] = {colCheckRange[1][1] + 2, colCheckRange[1][2] + 2}
 
                     local relBox = {vmul({-62, -112}, astronautScale / 0.75), vmul({136, 236}, astronautScale / 0.7)}
-                    local colBox = {
+                    astronaut.collisionBox = {
                         vadd(astronaut.position, relBox[1]),
                         relBox[2]
                     }
@@ -149,7 +149,7 @@ do
                     for y = colCheckRange[1][2], colCheckRange[2][2] do
                         for x = colCheckRange[1][1], colCheckRange[2][1] do
                             if astronaut.map[y][x] == TILE_INDICES.WALL then
-                                local mtv = aabbCollision(colBox, {{tileToWorld(x, y)}, {TILESIZE, TILESIZE}})
+                                local mtv = aabbCollision(astronaut.collisionBox, {{tileToWorld(x, y)}, {TILESIZE, TILESIZE}})
                                 if mtv then return mtv end
                             end
                         end
@@ -157,6 +157,7 @@ do
 
                     return nil
                 end
+            
 
                 astronaut.onGround = false
                 local delta = vmul(astronaut.velocity, simulationDt)

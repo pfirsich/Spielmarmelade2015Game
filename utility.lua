@@ -59,9 +59,9 @@ function intervalsOverlap(A, B) -- interval: {left, right}
 	return A[1] <= B[2] and B[1] <= A[2]
 end
 
-function aabbCollision(A, B) -- box: {{xleft, xright}, {yleft, yright}} (DAS WAR ES MAL. IS JETZT VORBEI)
+function aabbCollision(A, B) -- box = {{topleftx, toplefty}, {sizex, sizey}}
 	-- returns the MTV (minimal translation vector to resolve the collision) for the shape A if there is a collision, otherwise nil
-    -- box = {{topleftx, toplefty}, {sizex, sizey}}
+    
 	if  intervalsOverlap({A[1][1], A[1][1] + A[2][1]}, {B[1][1], B[1][1] + B[2][1]})
     and intervalsOverlap({A[1][2], A[1][2] + A[2][2]}, {B[1][2], B[1][2] + B[2][2]}) then
         local yOverlap = 0

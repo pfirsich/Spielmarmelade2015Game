@@ -204,7 +204,7 @@ do
 
         function actors.stomp(trap)
             local tile = getState().map.mapMeta[trap.ty][trap.tx].tile
-            spawnBody(tileSetImage, tileMap[tile], trap.tx+0.5, trap.ty+0.5, 180.0, 500.0, 0)
+            spawnBody(tileSetImage, tileMap[tile], trap.tx+0.5, trap.ty+0.5, math.pi, 500.0, 0, 128)
         end
 
         function actors.vanish(trap)
@@ -225,7 +225,7 @@ do
         end
         
         function actors.bullet(trap)        
-            spawnBody(trap.tp.ingameImage, 0, trap.tx+0.5, trap.ty+0.5, trap.angle, 800.0, trap.angle + math.pi*0.5)
+            spawnBody(trap.tp.ingameImage, 0, trap.tx+0.5, trap.ty+0.5, trap.angle, 800.0, trap.angle + math.pi*0.5, 16)
         end
         
         function actors.camouflage(ability, tx, ty)

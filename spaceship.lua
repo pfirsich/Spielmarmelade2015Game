@@ -17,7 +17,7 @@ do
         spaceship.notice = ""
 
         -- Abilities
-        spaceship.abilities = 13
+        spaceship.abilities = 22
 
         spaceship.updateResolution()
     end
