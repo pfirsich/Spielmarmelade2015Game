@@ -218,7 +218,7 @@ function drawGame(seeall)
             end
 
             drawAstronaut(astronaut.animations[astronaut.currentAnimation .. "_light"], astroHeadLight, {20, 0})
-            
+
             bodies.drawLight()
 
             -- draw shadow volumes
@@ -322,6 +322,8 @@ function drawGame(seeall)
         drawTraps(map)
         bodies.draw()
 
+        love.graphics.setColor(255, 100, 100, 100)
+        if seeall then love.graphics.circle("fill", astronaut.position[1], astronaut.position[2], astronaut.safeRadius, 64) end
         love.graphics.setColor(255, 255, 255, 255)
         drawAstronaut(astronaut.animations[astronaut.currentAnimation], astroHead)
     camera.pop()
