@@ -286,6 +286,7 @@ function drawGame(seeall)
     -- map and players
     camera.push()
         drawMap(map)
+        drawTraps(map)
 
         love.graphics.setColor(255, 255, 255, 255)
         animDraw(astronaut.animations[astronaut.currentAnimation], astronaut.position[1], astronaut.position[2], astronautScale, astronaut.flipped)
@@ -310,3 +311,29 @@ function drawGame(seeall)
     love.graphics.setBlendMode("alpha")
     love.graphics.setShader()
 end
+
+
+
+function drawTraps(map)
+    local drawRange = {
+        {screenToTiles(map, 0, 0)},
+        {screenToTiles(map, love.window.getWidth(), love.window.getHeight())}
+    }
+    
+    local img = 0
+    for t = 1, trapCount do
+        local trap = traps[t]
+        if not trap.hidden then
+            if getState() == astronaut then img = trap.tp.ingameImage else img = trap.tp.image end
+            if img then
+                if trap.tx >= drawRange[1][1] and trap.tx <= drawRange[2][1] then
+                    if trap.ty >= drawRange[1][2] and trap.ty <= drawRange[2][2] then
+                        love.graphics.draw(img, tileToWorld(trap.tx, trap.ty))
+                    end
+                end
+            end
+        end
+    end
+end
+
+
