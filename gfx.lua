@@ -217,7 +217,7 @@ function drawGame(seeall)
                 end
             end
 
-            drawAstronaut(astronaut.animations[astronaut.currentAnimation .. "_light"], astroHeadLight, {20, 0})
+            drawAstronaut(astronaut.animations[astronaut.currentAnimation .. "_light"], astroHeadLight, {12 * (astronaut.flipped and -1 or 1), -10})
 
             bodies.drawLight()
 
