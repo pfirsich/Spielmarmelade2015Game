@@ -36,6 +36,13 @@ function initGFX()
     astroIdle = love.graphics.newImage("media/images/idlesprite.png")
     astroJump = love.graphics.newImage("media/images/jumpingsprite.png")
 
+    astroHeadLight = love.graphics.newImage("media/images/light_head.png")
+    astroWalkLight = love.graphics.newImage("media/images/light_walkingsprite.png")
+    astroFallLight = love.graphics.newImage("media/images/light_fallingsprite.png")
+    astroIdleLight = love.graphics.newImage("media/images/light_idlesprite.png")
+    astroJumpLight = love.graphics.newImage("media/images/light_jumpingsprite.png")
+
+
     backgrounds = {
         love.graphics.newImage("media/images/Background1.png"),
         love.graphics.newImage("media/images/Background2.png"),
@@ -166,6 +173,28 @@ function drawGame(seeall)
             love.graphics.draw( headlightImage, astronaut.position[1], astronaut.position[2] - astronautImage:getHeight()*0.5 * astronautScale/0.75,
                                 vangle(astronaut.aimDirection), headLightScale, headLightScale, 25.0 * astronautScale/0.75, headlightImage:getHeight()*0.5)
 
+            love.graphics.setColor(255, 100, 100, 255)
+
+            drawRange = {
+                {screenToTiles(map, -love.window.getWidth(), -love.window.getHeight())},
+                {screenToTiles(map, love.window.getWidth()*2, love.window.getHeight()*2)}
+            }
+
+            for y = drawRange[1][2], drawRange[2][2] do
+                for x = drawRange[1][1], drawRange[2][1] do
+                    if map.mapMeta[y][x].light then
+                        local scale = 0.4
+                        local posX, posY = tileToWorld(x, y)
+                        posX = posX + TILESIZE/2
+                        posY = posY + TILESIZE
+                        love.graphics.draw( spotlightImage, posX, posY, math.pi/2.0, math.min(map.mapMeta[y][x].lightHeight, 10), scale, 0.0, headlightImage:getHeight()*0.5)
+                    end
+                end
+            end
+
+
+            drawAstronaut(astronaut.animations[astronaut.currentAnimation .. "_light"], astroHeadLight, {20, 0})
+
             -- draw shadow volumes
             local vertices = {}
 
@@ -194,7 +223,7 @@ function drawGame(seeall)
                 for x = drawRange[1][1], drawRange[2][1] do
                     local tile = map[y][x]
                     if map[y][x] == TILE_INDICES.WALL then
-                        local shadowOffset = 0.2 * TILESIZE
+                        local shadowOffset = 0.15 * TILESIZE
                         local topLeftX, topLeftY = tileToWorld(x, y)
                         local sizeX, sizeY = TILESIZE, TILESIZE
 
@@ -208,28 +237,6 @@ function drawGame(seeall)
                         checkEdge(x+1, y  , {topLeftX + sizeX, topLeftY + sizeY}, {topLeftX + sizeX, topLeftY})
                         checkEdge(x  , y-1, {topLeftX + sizeX, topLeftY}, {topLeftX, topLeftY})
                         checkEdge(x-1, y  , {topLeftX, topLeftY}, {topLeftX, topLeftY + sizeY})
-                    end
-                end
-            end
-
-
-
-            love.graphics.setBlendMode("additive")
-            love.graphics.setColor(255, 100, 100, 255)
-
-            drawRange = {
-                {screenToTiles(map, -love.window.getWidth(), -love.window.getHeight())},
-                {screenToTiles(map, love.window.getWidth()*2, love.window.getHeight()*2)}
-            }
-
-            for y = drawRange[1][2], drawRange[2][2] do
-                for x = drawRange[1][1], drawRange[2][1] do
-                    if map.mapMeta[y][x].light then
-                        local scale = 0.4
-                        local posX, posY = tileToWorld(x, y)
-                        posX = posX + TILESIZE/2
-                        posY = posY + TILESIZE
-                        love.graphics.draw( spotlightImage, posX, posY, math.pi/2.0, math.min(map.mapMeta[y][x].lightHeight, 10), scale, 0.0, headlightImage:getHeight()*0.5)
                     end
                 end
             end
@@ -289,14 +296,7 @@ function drawGame(seeall)
         drawTraps(map)
 
         love.graphics.setColor(255, 255, 255, 255)
-        animDraw(astronaut.animations[astronaut.currentAnimation], astronaut.position[1], astronaut.position[2], astronautScale, astronaut.flipped)
-        local anim = astronaut.animations[astronaut.currentAnimation]
-        local xoff = (anim.headOffsetX and anim.headOffsetX(animRelTime(anim)) or 0.0) * astronautScale / 0.75
-        local yoff = (anim.headOffsetY and anim.headOffsetY(animRelTime(anim)) or 0.0) * astronautScale / 0.75
-        local angle = vangle(astronaut.aimDirection) + (astronaut.flipped and math.pi or 0)
-        love.graphics.draw( astroHead, astronaut.position[1] + xoff * (astronaut.flipped and -1.0 or 1.0),
-                            astronaut.position[2] - anim.image:getHeight() * astronautScale * 0.4 + yoff,
-                            angle, astronautScale * (astronaut.flipped and -1.0 or 1.0), astronautScale, 33, 74)
+        drawAstronaut(astronaut.animations[astronaut.currentAnimation], astroHead)
     camera.pop()
 
     if not seeall then
@@ -312,14 +312,23 @@ function drawGame(seeall)
     love.graphics.setShader()
 end
 
-
+function drawAstronaut(anim, head, offset)
+    offset = offset or {0, 0}
+    animDraw(anim, astronaut.position[1] + offset[1], astronaut.position[2] + offset[2], astronautScale, astronaut.flipped)
+    local xoff = (anim.headOffsetX and anim.headOffsetX(animRelTime(anim)) or 0.0) * astronautScale / 0.75
+    local yoff = (anim.headOffsetY and anim.headOffsetY(animRelTime(anim)) or 0.0) * astronautScale / 0.75
+    local angle = vangle(astronaut.aimDirection) + (astronaut.flipped and math.pi or 0)
+    love.graphics.draw( head, astronaut.position[1] + xoff * (astronaut.flipped and -1.0 or 1.0),
+                        astronaut.position[2] - anim.image:getHeight() * astronautScale * 0.4 + yoff,
+                        angle, astronautScale * (astronaut.flipped and -1.0 or 1.0), astronautScale, 33, 74)
+end
 
 function drawTraps(map)
     local drawRange = {
         {screenToTiles(map, 0, 0)},
         {screenToTiles(map, love.window.getWidth(), love.window.getHeight())}
     }
-    
+
     local img = 0
     for t = 1, trapCount do
         local trap = traps[t]
@@ -335,5 +344,3 @@ function drawTraps(map)
         end
     end
 end
-
-
