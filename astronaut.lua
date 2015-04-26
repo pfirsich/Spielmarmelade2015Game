@@ -64,9 +64,10 @@ do
                     print("Connecting traps with id " .. vals[2] .. " and " .. vals[3])
                     local src = traps.getFromID(vals[2])
                     local trg = traps.getFromID(vals[3])
-                    src.trgX = trg.tx
-                    src.trgY = trg.ty
+                    src.trgx = trg.tx
+                    src.trgy = trg.ty
                     print("Traps connected: " .. src.tp.name .. " to " .. trg.tp.name)
+                    print("Positions " .. src.tx .. "," .. src.ty .. " -> " .. trg.tx .. "," .. trg.ty)
                 end
             end
             event = astronaut.host:service()
