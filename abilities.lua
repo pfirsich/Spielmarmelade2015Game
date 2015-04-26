@@ -17,21 +17,21 @@ do
     function abilities.load() 
         -- Load all abilities
         -- Sensors
-        abilities.add("Weight Sensor", "weight.png", "Triggers when weight stands on the sensor", 1, true, sensors.checkWeight, false, nil)
-        abilities.add("Movement Sensor", "move.png", "Triggers when something moves in its line of sight", 1, true, sensors.checkMovement, false, nil)
+        abilities.add("Weight Sensor", "weight.png", "Triggers when weight stands on the sensor", 1, true, sensors.checkWeight, false, nil, placement_freeWall)
+        abilities.add("Movement Sensor", "move.png", "Triggers when something moves in its line of sight", 1, true, sensors.checkMovement, false, nil, placement_freeWall)
         -- Actors
-        abilities.add("Stomp", "stomp.png", "Crushes whatever is underneath when triggered", 3, true, false, false, actors.stomp)
-        abilities.add("Vanishing Block", "vanish.png", "Vanishes when triggered", 2, true, false, false, actors.vanish)
+        abilities.add("Stomp", "stomp.png", "Crushes whatever is underneath when triggered", 3, true, false, false, actors.stomp, placement_wall)
+        abilities.add("Vanishing Block", "vanish.png", "Vanishes when triggered", 2, true, false, false, actors.vanish, placement_wall)
         -- abilities.add("Timer", "timer.png", "Waits for 3 seconds after being triggered before triggering itself", 1, true, false, false, actors.timer)
-        abilities.add("Fake", "fake.png", "Pretends to be a sensor/trap, but doesn't do anything", 1, true, false, false, nil)
-        abilities.add("Spikes", "spikes.png", "Deathly Spikes coming out of the ground", 2, true, false, false, actors.spikes)
+        abilities.add("Fake", "fake.png", "Pretends to be a sensor/trap, but doesn't do anything", 1, true, false, false, nil, placement_free)
+        abilities.add("Spikes", "spikes.png", "Deathly Spikes coming out of the ground", 2, true, false, false, actors.spikes, placement_freeWall)
         -- Buffs
-        abilities.add("Camouflage", "camouflage.png", "Hides a trap from being seen", 2, true, false, true, nil)
+        abilities.add("Camouflage", "camouflage.png", "Hides a trap from being seen", 2, true, false, actors.camouflage, nil, placement_trap)
         -- Survival
-        abilities.add("Teleport", "teleport.png", "Teleports you to a nearby position", 1, false, false, false, nil)
+        abilities.add("Teleport", "teleport.png", "Teleports you to a nearby position", 1, false, false, false, nil, nil)
     end
     
-    function abilities.add(name, image, tooltip, cost, forAI, sensorFunc, isBuff)
+    function abilities.add(name, image, tooltip, cost, forAI, sensorFunc, buffFunc, triggerFunc, placementFunc)
         abilityCount = abilityCount + 1
         abilities[abilityCount] = {name = name, 
             image = love.graphics.newImage("media/images/ability/" .. image), 
@@ -41,13 +41,40 @@ do
             forAI = forAI, 
             isSensor = (sensorFunc ~= false), 
             sensorFunc = sensorFunc, 
-            isBuff = isBuff, 
+            isBuff = (buffFunc ~= false), 
+            buffFunc = buffFunc,
             triggerFunc = triggerFunc,
-            isSource = (sensorFunc ~= false)
+            isSource = (sensorFunc ~= false),
+            placementFunction = placementFunc
         }
         local ingameFile = "media/images/ability/ingame_" .. image
         if love.filesystem.isFile(ingameFile) then abilities[abilityCount].ingameImage = love.graphics.newImage(ingameFile) end
     end
+    
+        function placement_free(tx,ty) 
+            return spaceship.map[ty][tx] == TILE_INDICES.FREE 
+        end
+        
+        function placement_freeWallBelow(tx,ty) 
+            return spaceship.map[ty][tx] == TILE_INDICES.FREE and spaceship.map[ty+1][tx] == TILE_INDICES.WALL 
+        end
+        
+        function placement_freeWall(tx,ty)             
+            if placement_free(tx,ty) then
+                if spaceship.map[ty][tx-1] == TILE_INDICES.WALL or spaceship.map[ty][tx+1] == TILE_INDICES.WALL or spaceship.map[ty-1][tx] == TILE_INDICES.WALL or spaceship.map[ty+1][tx] == TILE_INDICES.WALL then
+                    return true
+                end
+            end
+            return false 
+        end
+        
+        function placement_wall(tx,ty) 
+            return spaceship.map[ty][tx] == TILE_INDICES.WALL 
+        end
+        
+        function placement_trap(tx,ty) 
+            return (traps.getTrapAtPoint(tx,ty) ~= nil)
+        end
     
     function abilities.getRandom(forAI, maxCost) 
         if maxCost < 1 then return nil end
@@ -65,9 +92,15 @@ do
     end 
     
     function abilities.placeTrap(ability, tx, ty, id) 
-        trapCount = trapCount + 1
-        traps[trapCount] = {tp = ability, id = id, tx = tx, ty = ty, active = true, hidden = false, trgx = tx, trgy = ty, param = 0}
-        print("Trap " .. ability.name .. " created at tile " .. tx .. "," .. ty)
+        if not ability.isBuff then
+            trapCount = trapCount + 1
+            traps[trapCount] = {tp = ability, id = id, tx = tx, ty = ty, active = true, hidden = false, trgx = tx, trgy = ty, param = 0}
+            print("Trap " .. ability.name .. " created at tile " .. tx .. "," .. ty)
+        else
+            -- Buff
+            print("Creating Buff " .. ability.name .. " at " .. tx .. "," .. ty)
+            ability.buffFunc(ability, tx, ty)
+        end
     end
     
     function traps.getFromID(findID)
@@ -167,8 +200,11 @@ do
             -- ...
         end
         
-        function actors.camouflage(trap)
-            
+        function actors.camouflage(ability, tx, ty)
+            local trg = traps.getTrapAtPoint(tx, ty)
+            if trg then
+                trg.hidden = true
+            end
         end
 
 end

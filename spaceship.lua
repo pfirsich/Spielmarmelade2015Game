@@ -106,15 +106,18 @@ do
                 if mouseL then
                     if spaceship.selected > 0 then
                         -- place trap
-                        trapID = trapID + 1
-                        abilities.placeTrap(spaceship.buttons[spaceship.selected].ability, mtx, mty, trapID)
-                        spaceship.astronautPeer:send("PLTRP:" .. tostring(trapID) .. ":" .. spaceship.buttons[spaceship.selected].ability.name .. ":" .. tostring(mtx) .. ":" .. tostring(mty))
-                        -- remove from hand
-                        spaceship.abilitites = spaceship.abilities - 1
-                        for i = spaceship.selected, spaceship.abilities do
-                            spaceship.buttons[i].ability = spaceship.buttons[i+1].ability
+                        if spaceship.buttons[spaceship.selected].ability.placementFunction(mtx, mty) then
+                            print("Placing trap because placement function returned true")
+                            trapID = trapID + 1
+                            abilities.placeTrap(spaceship.buttons[spaceship.selected].ability, mtx, mty, trapID)
+                            spaceship.astronautPeer:send("PLTRP:" .. tostring(trapID) .. ":" .. spaceship.buttons[spaceship.selected].ability.name .. ":" .. tostring(mtx) .. ":" .. tostring(mty))
+                            -- remove from hand 
+                            spaceship.abilitites = spaceship.abilities - 1
+                            for i = spaceship.selected, spaceship.abilities do
+                                spaceship.buttons[i].ability = spaceship.buttons[i+1].ability
+                            end
+                            spaceship.selected = 0
                         end
-                        spaceship.selected = 0
                     else
                         -- Hovering over a placed tile?
                         print("Trying to drag at " .. mtx .. "," .. mty)
