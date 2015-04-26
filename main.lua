@@ -21,6 +21,7 @@ function love.load()
     mouseRightInput = watchBinaryInput(mouseButtonCallback("r"))
     initGFX()
     abilities.load()
+    astronaut.lives = 8
     setState(startscreen)
 	lush.setPath("media/sounds/")
 end

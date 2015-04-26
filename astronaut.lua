@@ -71,7 +71,7 @@ do
                     astronaut.initialized = true
                 elseif type == "PLTRP" then
                     local vals = split(event.data, ":")
-                    abilities.placeTrap(abilities.getTrapByName(vals[3]), tonumber(vals[4]), tonumber(vals[5]), tonumber(vals[2]))
+                    abilities.placeTrap(abilities.getTrapByName(vals[3]), tonumber(vals[4]), tonumber(vals[5]), tonumber(vals[2]), tonumber(vals[6]))
                 elseif type == "CNTRP" then
                     local vals = split(event.data, ":")
                     print("Connecting traps with id " .. vals[2] .. " and " .. vals[3])
@@ -202,7 +202,7 @@ do
     function astronaut.draw()
         if astronaut.spaceshipPeer and astronaut.initialized then
             drawGame()
-            love.graphics.print("Astronaut", 0, 0)
+            love.graphics.print("Lives: " .. tostring(astronaut.lives), 0, 0)
         else
             love.graphics.print("Waiting for spaceship", 0, 0)
         end
