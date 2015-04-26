@@ -88,7 +88,7 @@ function love.run()
             love.update()
         end
 
-        --lush.update()
+        lush.update()
 
         if love.window and love.graphics and love.window.isCreated() then
             love.graphics.clear()
