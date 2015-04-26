@@ -13,18 +13,15 @@ LINLINLINKLNKLNKLNKLNKLNKLNKL
 ## Technical
 This game is made using löve (https://love2d.org/), so it should run on any supported platform (please see the website for installation instructions).
 Archived versions can be found here:
-
-TerminationShock.love (link)
-
-TerminationShock-win32.zip (link)
-
-TerminationShock-win64.zip (link)
+* TerminationShock.love (link)
+* TerminationShock-win32.zip (link)
+* TerminationShock-win64.zip (link)
 
 ## Credits
-Jonas Lieb (http://www.jonaslieb.com/) - 2-hour final spurt helper
-Markus Over (http://shellfishgames.com/) - programming
-Lukas Schneider - art
-Joel Schumacher (http://theshoemaker.de/) - programming
+* Jonas Lieb (http://www.jonaslieb.com/) - 2-hour final spurt helper
+* Markus Over (http://shellfishgames.com/) - programming
+* Lukas Schneider - art
+* Joel Schumacher (http://theshoemaker.de/) - programming
 
 ## Media
 (VIDEO) (Spaceship)
