@@ -101,7 +101,7 @@ function worldToScreen(x, y)
     y = y + love.window.getHeight()/2
     return x, y
 end
-        
+
 
 function tilesToScreen(x, y)
     return worldToScreen( tileToWorld(x,y) )
@@ -110,14 +110,14 @@ end
 delayedCalls = {}
 
 function delay(func, seconds)
-	table.insert({func, totalTime + seconds})
+	table.insert(delayedCalls, {func, love.timer.getTime() + seconds})
 end
 
 function updateDelayedCalls()
 	-- Iterate back to front for save deletion while iterating
 	for i = #delayedCalls, 1, -1 do
 		local dcall = delayedCalls[i]
-		if dcall[2] < totalTime then
+		if dcall[2] < love.timer.getTime() then
 			dcall[1]()
 			table.remove(delayedCalls, i)
 		end
