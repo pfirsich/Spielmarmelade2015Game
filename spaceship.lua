@@ -33,7 +33,9 @@ do
         local y = love.window.getHeight() - dif - spaceship.hudImage:getHeight()*scale
         for i = 1, 24 do
             -- Apply Positions
+            local temp = abilities.getRandom(true, 3)
             spaceship.buttons[i] = {{x, y}, {x+width, y+scale*spaceship.hudImage:getHeight()}}
+            spaceship.buttons[i].ability = temp
             -- Proceed
             x = x + size
             if i == 12 then
@@ -92,7 +94,17 @@ do
             else 
                 -- not on HUD -> place tile?
                 if mouseL then
-                    -- ...
+                    if spaceship.selected > 0 then 
+                        -- place trap
+                        local mtx, mty = worldToTiles(spaceship.map, mouseX, mouseY)
+                        abilities.placeTrap(spaceship.buttons[spaceship.selected].ability, mtx, mty)
+                        -- remove from hand 
+                        spaceship.abilitites = spaceship.abilities - 1
+                        for i = spaceship.selected, spaceship.abilities do
+                            spaceship.buttons[i].ability = spaceship.buttons[i+1].ability
+                        end
+                        spaceship.selected = 0
+                    end
                 end
             end
             -- Deselect
@@ -103,6 +115,8 @@ do
             if mouseX >= love.window.getWidth() - moveBorder then camera.targetX = camera.targetX + camMoveSpeed end
             if mouseY <= moveBorder then camera.targetY = camera.targetY - camMoveSpeed end
             if mouseY >= love.window.getHeight() - moveBorder then camera.targetY = camera.targetY + camMoveSpeed end
+            
+            traps.update()
 
             camera.update(1/simulationDt) -- move instantly
         end
@@ -117,7 +131,7 @@ do
             -- Check Mouse
             if mx >= spaceship.buttons[i][1][1] and mx <= spaceship.buttons[i][2][1] and my >= spaceship.buttons[i][1][2] and my <= spaceship.buttons[i][2][2] then
                 -- Hover
-                spaceship.tooltip = "A button is being hovered"
+                spaceship.tooltip = spaceship.buttons[i].ability.tooltip
                 spaceship.hovered = i
                 -- Click
                 if mL then 
@@ -163,7 +177,7 @@ do
                 love.graphics.setColor(255,255,255,180)
                 yoff = 0
             end
-            love.graphics.draw( spaceship.hudImage, spaceship.buttons[i][1][1], spaceship.buttons[i][1][2]+yoff, 0, spaceship.buttonScale, spaceship.buttonScale, 0, 0)
+            love.graphics.draw( spaceship.buttons[i].ability.image, spaceship.buttons[i][1][1], spaceship.buttons[i][1][2]+yoff, 0, spaceship.buttonScale, spaceship.buttonScale, 0, 0)
         end
         love.graphics.setColor(255,255,255,255)
         -- Tooltip
