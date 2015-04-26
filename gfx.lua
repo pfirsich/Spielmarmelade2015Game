@@ -105,6 +105,8 @@ function initGFX()
         end
     end
 
+    love.graphics.setFont(love.graphics.newFont(24))
+
     reinitGFX()
 end
 
@@ -135,7 +137,7 @@ function drawMap(map)
     for y = drawRange[1][2], drawRange[2][2] do
         for x = drawRange[1][1], drawRange[2][1] do
             local tile = map[y][x]
-            if tile > 0 then
+            if tile ~= nil and tile > 0 then
                 if map[y][x] == TILE_INDICES.WALL and map.mapMeta then
                     tile = map.mapMeta[y][x].tile
                     local col = map.mapMeta[y][x].color
@@ -361,10 +363,10 @@ function drawTraps(map)
         local trap = traps[t]
         if trap.tx >= drawRange[1][1] and trap.tx <= drawRange[2][1] then
             if trap.ty >= drawRange[1][2] and trap.ty <= drawRange[2][2] then
-                if getState() == astronaut then 
+                if getState() == astronaut then
                     if trap.hidden then img = false else img = trap.tp.ingameImage end
-                else 
-                    img = trap.tp.image 
+                else
+                    img = trap.tp.image
                 end
                 if img ~= false then
                     local tempx, tempy = tileToWorld(trap.tx+0.5, trap.ty+0.5)

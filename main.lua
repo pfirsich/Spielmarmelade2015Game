@@ -14,6 +14,7 @@ require "camera"
 require "mapgen"
 require "gfx"
 require "abilities"
+lush = require "lush"
 
 function love.load()
     spaceship.hudImage = love.graphics.newImage("media/images/ability_back.png")
@@ -21,6 +22,7 @@ function love.load()
     mouseRightInput = watchBinaryInput(mouseButtonCallback("r"))
     initGFX()
     abilities.load()
+    astronaut.lives = 8
     setState(startscreen)
 end
 
@@ -89,7 +91,7 @@ function love.run()
             love.update()
         end
 
-        --lush.update()
+        lush.update()
 
         if love.window and love.graphics and love.window.isCreated() then
             love.graphics.clear()

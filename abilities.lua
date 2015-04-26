@@ -3,18 +3,18 @@ do
 
     abilityCount = 0
     abilities = {}
-    
+
     trapCount = 0
     traps = {}
     sensors = {}
     actors = {}
-    
+
     trapID = 0
-    
-    
-    local ability_dirs = {{0,1}, {-1,0}, {0,-1}, {1,0}}
-    
-    function abilities.load() 
+
+
+    local ability_dirs = {{-1,0}, {0,1}, {1,0}, {0,1}}
+
+    function abilities.load()
         -- Load all abilities
         -- Sensors
         abilities.add("Weight Sensor", "weight.png", false, "Triggers when weight stands on the sensor", 1, true, sensors.checkWeight, false, nil, placement_freeWall)
@@ -52,48 +52,48 @@ do
         local ingameFile = "media/images/ability/ingame_" .. image
         if love.filesystem.isFile(ingameFile) then abilities[abilityCount].ingameImage = love.graphics.newImage(ingameFile) end
     end
-    
-        function placement_free(tx,ty) 
-            return spaceship.map[ty][tx] == TILE_INDICES.FREE 
+
+        function placement_free(tx,ty)
+            return spaceship.map[ty][tx] == TILE_INDICES.FREE
         end
-        
-        function placement_freeWallBelow(tx,ty) 
-            return spaceship.map[ty][tx] == TILE_INDICES.FREE and spaceship.map[ty+1][tx] == TILE_INDICES.WALL 
+
+        function placement_freeWallBelow(tx,ty)
+            return spaceship.map[ty][tx] == TILE_INDICES.FREE and spaceship.map[ty+1][tx] == TILE_INDICES.WALL
         end
-        
-        function placement_freeWall(tx,ty)             
+
+        function placement_freeWall(tx,ty)
             if placement_free(tx,ty) then
                 if spaceship.map[ty][tx-1] == TILE_INDICES.WALL or spaceship.map[ty][tx+1] == TILE_INDICES.WALL or spaceship.map[ty-1][tx] == TILE_INDICES.WALL or spaceship.map[ty+1][tx] == TILE_INDICES.WALL then
                     return true
                 end
             end
-            return false 
+            return false
         end
-        
-        function placement_wall(tx,ty) 
-            return spaceship.map[ty][tx] == TILE_INDICES.WALL 
+
+        function placement_wall(tx,ty)
+            return spaceship.map[ty][tx] == TILE_INDICES.WALL
         end
-        
-        function placement_trap(tx,ty) 
+
+        function placement_trap(tx,ty)
             return (traps.getTrapAtPoint(tx,ty) ~= nil)
         end
-    
-    function abilities.getRandom(forAI, maxCost) 
+
+    function abilities.getRandom(forAI, maxCost)
         if maxCost < 1 then return nil end
         repeat
             i = math.random(1,abilityCount)
         until abilities[i].forAI == forAI and abilities[i].cost <= maxCost
         return abilities[i]
-    end 
-    
+    end
+
     function abilities.getTrapByName(name)
         for i = 1, abilityCount do
             if abilities[i].name == name then return abilities[i] end
         end
         return nil
-    end 
-    
-    function abilities.placeTrap(ability, tx, ty, id) 
+    end
+
+    function abilities.placeTrap(ability, tx, ty, id, side)
         if not ability.isBuff then
             trapCount = trapCount + 1
             traps[trapCount] = {tp = ability, id = id, tx = tx, ty = ty, active = true, hidden = ability.hidden, trgx = tx, trgy = ty, param = 0, angle = 0}
@@ -105,15 +105,8 @@ do
                 until abilities[traps[trapCount].param].ingameImage ~= false
             end
             -- Movement Sensor needs Direction
-            if ability.name == "Movement Sensor" or ability.name == "Spikes" then
-                local map = astronaut.map
-                if map == nil then map = spaceship.map end
-                if map[ty+1][tx] then traps[trapCount].param = 0 end
-                if map[ty][tx-1] then traps[trapCount].param = 1 end
-                if map[ty-1][tx] then traps[trapCount].param = 2 end
-                if map[ty][tx+1] then traps[trapCount].param = 3 end
-                traps[trapCount].angle = math.pi*0.5*traps[trapCount].param + math.pi
-            end
+            traps[trapCount].param = side
+            traps[trapCount].angle = math.pi/2.0*traps[trapCount].param - math.pi/2.0
             -- Spikes need Direction
         else
             -- Buff
@@ -121,30 +114,30 @@ do
             ability.buffFunc(ability, tx, ty)
         end
     end
-    
+
     function traps.getFromID(findID)
         id = tonumber(findID)
         for i = 1, trapCount do
             print("Trap " .. i .. " has id " .. traps[i].id .. ".")
             if traps[i].id == id then return traps[i] end
         end
-        return nil        
+        return nil
     end
-    
+
     function traps.getTrapAtPoint(tx, ty)
         for i = 1, trapCount do
             if traps[i].tx == tx and traps[i].ty == ty then return traps[i] end
         end
-        return nil        
+        return nil
     end
-    
+
     function traps.getSourceTrapAtPoint(tx, ty)
         for i = 1, trapCount do
             if traps[i].tp.isSource and traps[i].tx == tx and traps[i].ty == ty then return traps[i] end
         end
-        return nil       
+        return nil
     end
-    
+
     function traps.update()
         -- astronaut.onTileX, astronaut.onTileY = worldToTiles(astronaut.map, astronaut.position[1], astronaut.position[2])
         for t = 1, trapCount do
@@ -154,8 +147,8 @@ do
             end
         end
     end
-    
-        function traps.trigger(tx,ty) 
+
+        function traps.trigger(tx,ty)
             print("Triggering at " .. tx .. "," .. ty)
             for t = 1, trapCount do
                 print("Checking " .. traps[t].tp.name .. " at " .. traps[t].tx .. "," .. traps[t].ty)
@@ -168,7 +161,7 @@ do
                 end
             end
         end
-    
+
         function traps.actuallyTrigger(trap)
             print("Triggering trap of type " .. trap.tp.name)
             -- Deactivate after use
@@ -178,7 +171,7 @@ do
             -- Activate
             trap.tp.triggerFunc(trap)
         end
-    
+
         function sensors.checkWeight(sensor)
             -- print("Checking sensor at " .. tostring(sensor.tx) .. "," .. tostring(sensor.ty) .. " while astronaut is on " .. tostring(astronaut.onTileX) .. "," .. tostring(astronaut.onTileY))
             if astronaut.onTileX == sensor.tx and astronaut.onTileY == sensor.ty then
@@ -187,7 +180,7 @@ do
                 end
             end
         end
-        
+
         function sensors.checkMovement(sensor)
             local dir = ability_dirs[sensor.param+1]
             local tx, ty = sensor.tx, sensor.ty
@@ -201,32 +194,32 @@ do
                 ty = ty + dir[2]
             end
         end
-        
+
         function sensors.trigger(sensor)
             print("Triggering sensor of type " .. sensor.tp.name .. " at " .. sensor.tx .. "," .. sensor.ty .. " -> " .. sensor.trgx .. "," .. sensor.trgy)
             traps.trigger(sensor.trgx, sensor.trgy)
             sensor.active = false
         end
 
-        
+
         function actors.stomp(trap)
             local tile = getState().map.mapMeta[trap.ty][trap.tx].tile
             spawnBody(tileSetImage, tileMap[tile], trap.tx+0.5, trap.ty+0.5, 180.0, 500.0, 0)
         end
-        
+
         function actors.vanish(trap)
             print("Vanishing block at " .. trap.tx .. "," .. trap.ty)
-            if getState() == astronaut then 
+            if getState() == astronaut then
                 astronaut.map[trap.ty][trap.tx] = TILE_INDICES.FREE
             else
                 spaceship.map[trap.ty][trap.tx] = TILE_INDICES.FREE
             end
         end
-        
+
         function actors.timer(trap)
             if getState() == astronaut then delay(function() traps.trigger(trap.trgx, trap.trgy) end, 3) end
         end
-        
+
         function actors.spikes(trap)
             -- ...
         end
