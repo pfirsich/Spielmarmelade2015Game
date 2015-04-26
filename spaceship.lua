@@ -83,6 +83,12 @@ do
                     local vals = split(event.data, ":")
                     local trap = traps.getFromID(vals[2])
                     traps.actuallyTrigger(trap)
+                elseif type == "PLDIE" then
+                    astronaut.lives = astronaut.lives - 1
+                elseif type == "SPAWN" then
+                    local vals = split(event.data, ":")
+                    astronaut.position = {tonumber(vals[2]), tonumber(vals[3])}
+                    camera.targetX, camera.targetY = unpack(astronaut.position)
                 end
             end
             event = spaceship.host:service()
