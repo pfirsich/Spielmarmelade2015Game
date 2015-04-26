@@ -16,7 +16,7 @@ do
         spaceship.server = spaceship.host:connect(ip .. ":" .. PORT)
 
         -- Abilities
-        spaceship.abilities = 13
+        spaceship.abilities = 22
 
         spaceship.updateResolution()
     end
