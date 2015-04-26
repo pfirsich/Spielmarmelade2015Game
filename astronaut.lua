@@ -98,14 +98,15 @@ do
                 end
             end
 
-            -- send updates
-            astronaut.spaceshipPeer:send("PLPOS:" .. tostring(astronaut.position[1]) .. ":" .. tostring(astronaut.position[2]))
-
-            -- update camera
             local mouseX, mouseY = camera.screenToWorld(love.mouse.getPosition())
             local camAimDist = TILESIZE * 1.5
             astronaut.aimDirection = vMaxLen(vsub({mouseX, mouseY}, astronaut.position), camAimDist)
 
+            -- send updates
+            astronaut.spaceshipPeer:send(   "PLPOS:" .. tostring(astronaut.position[1]) .. ":" .. tostring(astronaut.position[2]) .. ":" ..
+                                            tostring(astronaut.aimDirection[1]) .. ":" .. tostring(astronaut.aimDirection[2]))
+
+            -- update camera
             camera.targetX, camera.targetY = unpack(vadd(astronaut.position, astronaut.aimDirection))
             camera.update()
         end

@@ -64,12 +64,14 @@ do
 
                     spaceship.initialized = true
                     astronaut.position = {tileToWorld(unpack(spaceship.map.spawn))}
+                    astronaut.aimDirection = {0, 0}
                     camera.targetX, camera.targetY = unpack(astronaut.position)
 
                     event.peer:send("INITD") -- initialization done
                 elseif type == "PLPOS" then
                     local vals = split(event.data, ":")
                     astronaut.position = {tonumber(vals[2]), tonumber(vals[3])}
+                    astronaut.aimDirection = {tonumber(vals[4]), tonumber(vals[5])}
                 end
             end
             event = spaceship.host:service()
@@ -133,6 +135,12 @@ do
             love.graphics.print("Spaceship", 0, 0)
         else
             love.graphics.print("Connecting...", 0, 0)
+        end
+    end
+
+    function spaceship.keypressed(key)
+        if key == " " then
+            camera.targetX, camera.targetY = unpack(astronaut.position)
         end
     end
 
