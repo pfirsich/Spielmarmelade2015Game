@@ -61,7 +61,7 @@ end
 
 function aabbCollision(A, B) -- box = {{topleftx, toplefty}, {sizex, sizey}}
 	-- returns the MTV (minimal translation vector to resolve the collision) for the shape A if there is a collision, otherwise nil
-    
+
 	if  intervalsOverlap({A[1][1], A[1][1] + A[2][1]}, {B[1][1], B[1][1] + B[2][1]})
     and intervalsOverlap({A[1][2], A[1][2] + A[2][2]}, {B[1][2], B[1][2] + B[2][2]}) then
         local yOverlap = 0
@@ -122,4 +122,8 @@ function updateDelayedCalls()
 			table.remove(delayedCalls, i)
 		end
 	end
+end
+
+function randf(min, max)
+	return love.math.random() * (max - min) + min
 end
