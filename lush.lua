@@ -4,10 +4,9 @@ local soundDataMap = {}
 local getSoundData = function(str)
 	if not soundDataMap[str] then
 		soundDataMap[str] = love.sound.newSoundData(str)
-		return soundDataMap[str]
-	else
-		return soundDataMap[str]
+		print("load: ", str)
 	end
+	return soundDataMap[str]
 end
 
 local lush = {} -- Lightweight, Unefficient Sound Helper library
