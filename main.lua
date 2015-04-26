@@ -13,6 +13,7 @@ require "camera"
 require "mapgen"
 require "gfx"
 require "abilities"
+lush = require "lush"
 
 function love.load()
     spaceship.hudImage = love.graphics.newImage("media/images/ability_back.png")
