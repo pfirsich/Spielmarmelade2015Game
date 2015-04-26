@@ -24,6 +24,7 @@ function love.load()
 end
 
 function love.update()
+    updateDelayedCalls()
     updateWatchedInputs()
 
     local state = getState()

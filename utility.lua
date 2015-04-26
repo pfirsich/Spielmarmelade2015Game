@@ -91,3 +91,20 @@ end
 function screenToTiles(map, x, y)
     return worldToTiles(map, camera.screenToWorld(x, y))
 end
+
+delayedCalls = {}
+
+function delay(func, seconds)
+	table.insert({func, totalTime + seconds})
+end
+
+function updateDelayedCalls()
+	-- Iterate back to front for save deletion while iterating
+	for i = #delayedCalls, 1, -1 do
+		local dcall = delayedCalls[i]
+		if dcall[2] < totalTime then
+			dcall[1]()
+			table.remove(delayedCalls, i)
+		end
+	end
+end
