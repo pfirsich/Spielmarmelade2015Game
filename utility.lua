@@ -100,7 +100,7 @@ end
 
 function updateDelayedCalls()
 	-- Iterate back to front for save deletion while iterating
-	for i = delayedCalls, 1, -1 do
+	for i = #delayedCalls, 1, -1 do
 		local dcall = delayedCalls[i]
 		if dcall[2] < totalTime then
 			dcall[1]()
