@@ -46,7 +46,7 @@ do
                     event.peer:send("HELLO:" .. tostring(astronaut.map.seed)) -- send necessary data
                 elseif type == "INITD" then -- initialization done
                     astronaut.initialized = true
-                elseif type == "PLTRP" then 
+                elseif type == "PLTRP" then
                     local vals = split(event.data, ":")
                     abilities.placeTrap(abilities.getTrapByName(vals[3]), tonumber(vals[4]), tonumber(vals[5]), tonumber(vals[2]))
                 elseif type == "CNTRP" then
@@ -56,7 +56,7 @@ do
                     local trg = traps.getFromID(vals[3])
                     src.trgX = trg.tx
                     src.trgY = trg.ty
-                    print("Traps connected: " .. src.tp.name .. " to " .. trg.tp.name)                    
+                    print("Traps connected: " .. src.tp.name .. " to " .. trg.tp.name)
                 end
             end
             event = astronaut.host:service()
@@ -156,9 +156,10 @@ do
 
             -- send updates
             astronaut.spaceshipPeer:send(   "PLPOS:" .. tostring(astronaut.position[1]) .. ":" .. tostring(astronaut.position[2]) .. ":" ..
-                                            tostring(astronaut.aimDirection[1]) .. ":" .. tostring(astronaut.aimDirection[2]))
-                                            
-            
+                                            tostring(astronaut.aimDirection[1]) .. ":" .. tostring(astronaut.aimDirection[2]) .. ":" ..
+                                            astronaut.currentAnimation .. ":" .. tostring(astronaut.animations[astronaut.currentAnimation].time) .. ":" ..
+                                            tostring(astronaut.flipped), 0, "unsequenced")
+
             traps.update()
 
             -- update camera
