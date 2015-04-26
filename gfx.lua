@@ -1,5 +1,11 @@
+function anim(image, from, to)
+
+end
+
 function initGFX()
     astronautImage = love.graphics.newImage("media/images/survivor.png")
+
+
     headlightImage = love.graphics.newImage("media/images/headlight.png")
     backgrounds = {
         love.graphics.newImage("media/images/Background1.png"),
@@ -9,7 +15,7 @@ function initGFX()
     bgSize = {backgrounds[1]:getWidth(), backgrounds[1]:getHeight()}
     bgCountX, bgCountY = math.ceil(love.window.getWidth()/bgSize[1]), math.ceil(love.window.getHeight()/bgSize[2])
 
-    lightMapScale = 2
+    lightMapScale = 4
     shadowMesh = love.graphics.newMesh(500, nil, "triangles")
 
     blurShader = love.graphics.newShader([[
@@ -38,6 +44,12 @@ function initGFX()
 
     	return vec4(col, bloomStrength);
     }]])
+
+    lightMapShader = love.graphics.newShader([[
+    vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
+        return vec4(pow(Texel(texture, texture_coords).rgb, vec3(1.0)) * 1.2, 1.0);
+    }
+    ]])
 
     tileSetImage = love.graphics.newImage("media/images/tiles.png")
     tilesX, tilesY = math.floor(tileSetImage:getWidth() / TILESIZE), math.floor(tileSetImage:getHeight() / TILESIZE)
@@ -80,6 +92,7 @@ function drawMap(map)
 end
 
 function extrudeShadowEdge(vertices, edgeFrom, edgeTo, from)
+    local shadowOffset = 0.0 --0.2 * TILESIZE
     local shadowLength = 10000
 
     local vertex = function(point, len)
@@ -89,8 +102,8 @@ function extrudeShadowEdge(vertices, edgeFrom, edgeTo, from)
         return {point[1] + relX * len, point[2] + relY * len, 0, 0}
     end
 
-    local f = {edgeFrom[1], edgeFrom[2], 0, 0}
-    local t = {edgeTo[1], edgeTo[2], 0, 0}
+    local f = vertex(edgeFrom, shadowOffset) --{edgeFrom[1], edgeFrom[2], 0, 0}
+    local t = vertex(edgeTo, shadowOffset) --{edgeTo[1], edgeTo[2], 0, 0}
     local ef = vertex(edgeFrom, shadowLength)
     local et = vertex(edgeTo, shadowLength)
 
@@ -109,11 +122,11 @@ function drawGame()
     -- light map
     camera.push(1.0/lightMapScale)
         love.graphics.setCanvas(lightMap)
-        local ambient = 20
+        local ambient = 45
         lightMap:clear(ambient, ambient, ambient, 255)
         love.graphics.setBlendMode("additive")
         local headLightScale = 0.9
-        love.graphics.setColor(255, 255, 255, 150)
+        love.graphics.setColor(255, 255, 255, 190)
         love.graphics.draw( headlightImage, astronaut.position[1], astronaut.position[2] - astronautImage:getHeight()*0.3,
                             vangle(astronaut.aimDirection), headLightScale, headLightScale, 0.0, headlightImage:getHeight()*0.5)
 
@@ -125,12 +138,13 @@ function drawGame()
         local checkEdge = function(x, y, from, to)
             if y < 1 or x < 1 or y > map.height or x > map.width then return end
 
-            if map[y][x] ~= TILE_INDICES.WALL then
+            if map[y][x] ~= TILE_INDICES.WALL or true then
                 local normal = vsub(to, from)
                 normal = vnormed({normal[2], -normal[1]})
-                if vdot(normal, aimDir) < 0.0 then
+                if vdot(normal, aimDir) > 0.0 or true then -- 1337 h4ckz
+                    local del = vmul(normal, 0.2*TILESIZE)
+                    extrudeShadowEdge(vertices, vadd(from, del), vadd(to, del), astronaut.position)
                 end
-                    extrudeShadowEdge(vertices, from, to, astronaut.position)
             end
         end
 
@@ -152,16 +166,10 @@ function drawGame()
             end
         end
 
-        if #vertices > 0 then
-            love.graphics.setBlendMode("alpha")
-            love.graphics.setColor(ambient, ambient, ambient, 255)
 
-            shadowMesh:setVertices(vertices)
-            love.graphics.draw(shadowMesh)
-        end
 
         love.graphics.setBlendMode("additive")
-        love.graphics.setColor(255, 255, 255, 60)
+        love.graphics.setColor(255, 180, 180, 255)
 
         drawRange = {
             {screenToTiles(map, -love.window.getWidth(), -love.window.getHeight())},
@@ -177,6 +185,15 @@ function drawGame()
                     love.graphics.draw( headlightImage, posX, posY, math.pi/2.0, map.mapMeta[y][x].lightHeight, scale, 0.0, headlightImage:getHeight()*0.5)
                 end
             end
+        end
+
+        if #vertices > 0 then
+            love.graphics.setBlendMode("alpha")
+            local shadowColor = 0
+            love.graphics.setColor(shadowColor, shadowColor, shadowColor, 255)
+
+            shadowMesh:setVertices(vertices)
+            love.graphics.draw(shadowMesh)
         end
     camera.pop()
 
@@ -226,7 +243,10 @@ function drawGame()
     camera.pop()
 
     love.graphics.setBlendMode("multiplicative")
+    -- love.graphics.setBlendMode("replace")
+    love.graphics.setShader(lightMapShader)
     love.graphics.draw(lightMap, 0, 0, 0, lightMapScale, lightMapScale)
 
+    love.graphics.setShader()
     love.graphics.setBlendMode("alpha")
 end
