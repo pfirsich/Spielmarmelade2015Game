@@ -8,6 +8,9 @@ do
     spaceship.hudTop = 0
     spaceship.selected = 0
 
+    spaceship.isDragging = false
+    spaceship.dragSource = nil
+
     function spaceship.enter(fromState, ip)
         spaceship.host = enet.host_create()
         spaceship.server = spaceship.host:connect(ip .. ":" .. PORT)
@@ -48,8 +51,6 @@ do
     end
 
 
-
-
     function spaceship.update()
         local event = spaceship.host:service()
         while event do
@@ -65,6 +66,7 @@ do
                     spaceship.map = generateLevel(tonumber(vals[2]))
 
                     spaceship.initialized = true
+                    astronaut.setupAnimations()
                     astronaut.position = {tileToWorld(unpack(spaceship.map.spawn))}
                     astronaut.aimDirection = {0, 0}
                     camera.targetX, camera.targetY = unpack(astronaut.position)
@@ -74,6 +76,10 @@ do
                     local vals = split(event.data, ":")
                     astronaut.position = {tonumber(vals[2]), tonumber(vals[3])}
                     astronaut.aimDirection = {tonumber(vals[4]), tonumber(vals[5])}
+                elseif type == "TRTRG" then
+                    local vals = split(event.data, ":")
+                    local trap = traps.getFromID(vals[2])
+                    traps.actuallyTrigger(trap)
                 end
             end
             event = spaceship.host:service()
@@ -93,32 +99,60 @@ do
                 moveBorder = 12
             else
                 -- not on HUD -> place tile?
+                local mtx, mty = screenToTiles(spaceship.map, mouseX, mouseY)
                 if mouseL then
-                    if spaceship.selected > 0 then 
+                    if spaceship.selected > 0 then
                         -- place trap
-                        local mtx, mty = worldToTiles(spaceship.map, mouseX, mouseY)
-                        abilities.placeTrap(spaceship.buttons[spaceship.selected].ability, mtx, mty)
-                        -- remove from hand 
+                        trapID = trapID + 1
+                        abilities.placeTrap(spaceship.buttons[spaceship.selected].ability, mtx, mty, trapID)
+                        spaceship.astronautPeer:send("PLTRP:" .. tostring(trapID) .. ":" .. spaceship.buttons[spaceship.selected].ability.name .. ":" .. tostring(mtx) .. ":" .. tostring(mty))
+                        -- remove from hand
                         spaceship.abilitites = spaceship.abilities - 1
                         for i = spaceship.selected, spaceship.abilities do
                             spaceship.buttons[i].ability = spaceship.buttons[i+1].ability
                         end
                         spaceship.selected = 0
+                    else
+                        -- Hovering over a placed tile?
+                        print("Trying to drag at " .. mtx .. "," .. mty)
+                        local trap = traps.getSourceTrapAtPoint(mtx, mty)
+                        if trap ~= nil then
+                            print("Starting to drag trap " .. trap.tp.name)
+                            spaceship.isDragging = true
+                            spaceship.dragSource = trap
+                        end
+                    end
+                else
+                    if mouseLeftInput().released then
+                        if spaceship.isDragging then
+                            local trg = traps.getTrapAtPoint(mtx, mty)
+                            if trg then
+                                -- Apply
+                                spaceship.dragSource.trgX = trg.tx
+                                spaceship.dragSource.trgY = trg.ty
+                                -- Send to Astronaut
+                                spaceship.astronautPeer:send("CNTRP:" .. spaceship.dragSource.id .. ":" .. trg.id)
+                                print("Traps connected: " .. spaceship.dragSource.tp.name .. " to " .. trg.tp.name)
+                            end
+                            -- stop dragging
+                            spaceship.isDragging = false
+                            spaceship.dragSource = nil
+                        end
                     end
                 end
             end
             -- Deselect
             if mouseR then spaceship.selected = 0 end
             -- TODO: mouse wheel zoom?
-            local camMoveSpeed = 1.8 * simulationDt * TILESIZE
-            if mouseX <= moveBorder then camera.targetX = camera.targetX - camMoveSpeed end
-            if mouseX >= love.window.getWidth() - moveBorder then camera.targetX = camera.targetX + camMoveSpeed end
-            if mouseY <= moveBorder then camera.targetY = camera.targetY - camMoveSpeed end
-            if mouseY >= love.window.getHeight() - moveBorder then camera.targetY = camera.targetY + camMoveSpeed end
-            
-            traps.update()
+            local camMoveSpeed = 3.2 * simulationDt * TILESIZE
+            local b2I = function(b) return b and 1 or 0 end
+            local moveX = b2I(mouseX >= love.window.getWidth() - moveBorder) + b2I(love.keyboard.isDown("d")) - b2I(mouseX <= moveBorder) - b2I(love.keyboard.isDown("a"))
+            local moveY = b2I(mouseY >= love.window.getHeight() - moveBorder) + b2I(love.keyboard.isDown("s")) - b2I(mouseY <= moveBorder) - b2I(love.keyboard.isDown("w"))
+            camera.targetX = camera.targetX + camMoveSpeed * moveX
+            camera.targetY = camera.targetY + camMoveSpeed * moveY
 
             camera.update(1/simulationDt) -- move instantly
+            camera.scale = 0.4
         end
     end
 
@@ -143,7 +177,7 @@ do
 
     function spaceship.draw()
         if spaceship.astronautPeer and spaceship.initialized then
-            drawGame()
+            drawGame(true)
             spaceship.drawHUD()
 
             love.graphics.print("Spaceship", 0, 0)
@@ -177,6 +211,12 @@ do
             love.graphics.draw( spaceship.buttons[i].ability.image, spaceship.buttons[i][1][1], spaceship.buttons[i][1][2]+yoff, 0, spaceship.buttonScale, spaceship.buttonScale, 0, 0)
         end
         love.graphics.setColor(255,255,255,255)
+        -- drag'n'drop line
+        if spaceship.isDragging then
+            local srcx, srcy = tilesToScreen( spaceship.dragSource.tx+0.5, spaceship.dragSource.ty+0.5 )
+            local trgx, trgy = love.mouse.getPosition()
+            love.graphics.line(srcx, srcy, trgx, trgy)
+        end
         -- Tooltip
         if spaceship.tooltip ~= "" then
             love.graphics.print(spaceship.tooltip, love.window.getWidth()*0.5, 20)

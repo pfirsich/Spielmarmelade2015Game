@@ -92,6 +92,21 @@ function screenToTiles(map, x, y)
     return worldToTiles(map, camera.screenToWorld(x, y))
 end
 
+function worldToScreen(x, y)
+    x = x - camera.x
+    y = y - camera.y
+    x = x * camera.scale
+    y = y * camera.scale
+    x = x + love.window.getWidth()/2
+    y = y + love.window.getHeight()/2
+    return x, y
+end
+        
+
+function tilesToScreen(x, y)
+    return worldToScreen( tileToWorld(x,y) )
+end
+
 delayedCalls = {}
 
 function delay(func, seconds)
