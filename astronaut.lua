@@ -182,15 +182,15 @@ do
                 astronaut.animations[astronaut.currentAnimation].time = astronaut.animations[astronaut.currentAnimation].time + simulationDt * timeDir		
 				
 				if astronaut.currentAnimation == "walk" and (astronaut.passedFrame(2, timeDir) or astronaut.passedFrame(27, timeDir)) then
-					lush.play("steps.mp3", {tags={"astronaut", "steps"}, volume=0.7})
+					lush.play("steps.mp3", {tags={"astronaut", "steps"}, volume=0.8})
 				end
 				
 				if astronaut.currentAnimation == "idle" and astronaut.passedFrame(3, timeDir) then
-					lush.play("breath.mp3", {tags= {"astronaut", "breath"}, volume = 0.05})
+					lush.play("breath.mp3", {tags= {"astronaut", "breath"}, volume = 0.08})
 				end
 				
 				if not astronaut.lastOnGround and astronaut.onGround then
-					lush.play("land.mp3", {tags={"astronaut", "steps"}, volume=0.7})
+					lush.play("land.mp3", {tags={"astronaut", "steps"}, volume=0.8})
 				end
 				
 				astronaut.lastFrame = animFrame(astronaut.animations[astronaut.currentAnimation])
@@ -226,6 +226,7 @@ do
         astronaut.spaceshipPeer:send("PLDIE")
         astronaut.lives = astronaut.lives - 1
         astronaut.alive = false
+		lush.play("wilhelm.mp3", {tags={"astronaut", "death"}, volume=0.9})
     end
 
     function astronaut.draw()
