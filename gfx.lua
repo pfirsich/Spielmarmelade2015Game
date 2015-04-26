@@ -324,11 +324,11 @@ function drawTraps(map)
     for t = 1, trapCount do
         local trap = traps[t]
         if getState() == astronaut then 
-            img = trap.hidden and 0 or trap.tp.ingameImage 
+            if trap.hidden then img = false else img = trap.tp.ingameImage end
         else 
             img = trap.tp.image 
         end
-        if img then
+        if img ~= false then
             if trap.tx >= drawRange[1][1] and trap.tx <= drawRange[2][1] then
                 if trap.ty >= drawRange[1][2] and trap.ty <= drawRange[2][2] then
                     love.graphics.draw(img, tileToWorld(trap.tx, trap.ty))
