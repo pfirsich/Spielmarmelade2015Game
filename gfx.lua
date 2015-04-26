@@ -80,7 +80,7 @@ function drawMap(map)
 end
 
 function extrudeShadowEdge(vertices, edgeFrom, edgeTo, from)
-    local shadowLength = love.window.getWidth()
+    local shadowLength = 10000
 
     local vertex = function(point, len)
         local relX, relY = point[1] - from[1], point[2] - from[2]
