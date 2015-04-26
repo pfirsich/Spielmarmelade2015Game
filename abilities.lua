@@ -31,19 +31,19 @@ do
         -- Survival
         abilities.add("Teleport", "teleport.png", false, "Teleports you to a nearby position", 1, false, false, false, nil, nil)
     end
-    
+
     function abilities.add(name, image, hiddenByDefault, tooltip, cost, forAI, sensorFunc, buffFunc, triggerFunc, placementFunc)
         abilityCount = abilityCount + 1
-        abilities[abilityCount] = {name = name, 
-            image = love.graphics.newImage("media/images/ability/" .. image), 
-            ingameImage = false, 
+        abilities[abilityCount] = {name = name,
+            image = love.graphics.newImage("media/images/ability/" .. image),
+            ingameImage = false,
             hidden = hiddenByDefault,
-            tooltip = tooltip, 
-            cost = cost, 
-            forAI = forAI, 
-            isSensor = (sensorFunc ~= false), 
-            sensorFunc = sensorFunc, 
-            isBuff = (buffFunc ~= false), 
+            tooltip = tooltip,
+            cost = cost,
+            forAI = forAI,
+            isSensor = (sensorFunc ~= false),
+            sensorFunc = sensorFunc,
+            isBuff = (buffFunc ~= false),
             buffFunc = buffFunc,
             triggerFunc = triggerFunc,
             isSource = (sensorFunc ~= false),
@@ -223,11 +223,11 @@ do
         function actors.spikes(trap)
             -- ...
         end
-        
-        function actors.bullet(trap)        
+
+        function actors.bullet(trap)
             spawnBody(trap.tp.ingameImage, 0, trap.tx+0.5, trap.ty+0.5, trap.angle, 800.0, trap.angle + math.pi*0.5, 16)
         end
-        
+
         function actors.camouflage(ability, tx, ty)
             local trg = traps.getTrapAtPoint(tx, ty)
             if trg then
