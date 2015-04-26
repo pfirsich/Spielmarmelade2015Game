@@ -38,8 +38,8 @@ do
         local midx = level.width/2
         local midy = level.height/2
         -- Generate two random branches
-        generateBranch(level, midx, midy, 2, rand(1,rand(4,6))) -- right
-        generateBranch(level, midx, midy, 4, rand(1,rand(4,6))) -- left
+        generateBranch(level, midx, midy, 2, rand(1,3)) -- right
+        generateBranch(level, midx, midy, 4, rand(1,4)) -- left
 
         -- Spawn Point
         generateCave(level, midx, midy)
@@ -75,14 +75,14 @@ do
         if rand(1,100) <= 48 then
             -- Vertical
             if rand(1,2) == 1 then d = 1 else d = 3 end
-            if rand(1,4) > 3 then
+            if rand(1,4) > 2 then
                 -- Away from center
                 if 2*y ~= maxh then if 2*y > maxh then d = 1 else d = 3 end end
             end
         else
             -- Horizontal
             if rand(1,2) == 1 then d = 2 else d = 4 end
-            if rand(1,4) > 3 then
+            if rand(1,4) > 2 then
                 -- Away from center
                 if 2*x > maxw then d = 4 else d = 2 end
             end
@@ -93,7 +93,7 @@ do
     function generateBranch(level, x, y, direction, childs)
         local dirs = {{0,1}, {-1,0}, {0,-1}, {1,0}}
         local dir = dirs[direction]
-        local segments = rand(8,20)
+        local segments = rand(10,20)
         local branchSegment = 0
         local containsGoal = false
         if childs > 0 then
@@ -132,12 +132,12 @@ do
         local steps = 0
         local vertical = (dir[2] ~= 0)
         if vertical then
-            steps = rand(1, rand(3,7))
+            steps = rand(2, rand(4,9))
         else
-            steps = rand(6, 14)
+            steps = rand(7, 14)
         end
         local offL = 1 --rand(1,2)
-        local offR = 0 --rand(0,1)
+        local offR = vertical and 1 or 0 --rand(0,1)
         local requiresLadder = (vertical and steps >= 2)
         local x2, y2 = 0
         --if dir[2] > 0 and rand(1,3) == 1 then requiresLadder = false end
@@ -151,7 +151,7 @@ do
             x = x + dir[1]
             y = y + dir[2]
             -- Check if it intervenes with another branch
-            if i > 5 then
+            if i > 4 then
                 x2 = x + dir[1]
                 y2 = y + dir[2]
                 if vertical then
@@ -179,7 +179,11 @@ do
                 level[y][x] = TILE_INDICES.LADDER
             end
             -- Change offset
-            if rand(1,8)==1 then offL = rand(1,2) end
+            if vertical then 
+                if rand(1,8)==1 then offL = rand(1,2) end
+            else
+                if rand(1,8)==1 then offL = rand(0,1) end
+            end
             if rand(1,8)==1 then offR = rand(0,1) end
             -- Cave
             if rand(1,32) == 1 then generateCave(level,x,y) end
