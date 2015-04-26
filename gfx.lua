@@ -137,7 +137,7 @@ function drawMap(map)
     for y = drawRange[1][2], drawRange[2][2] do
         for x = drawRange[1][1], drawRange[2][1] do
             local tile = map[y][x]
-            if tile > 0 then
+            if tile ~= nil and tile > 0 then
                 if map[y][x] == TILE_INDICES.WALL and map.mapMeta then
                     tile = map.mapMeta[y][x].tile
                     local col = map.mapMeta[y][x].color
