@@ -10,6 +10,8 @@ do
         astronaut.position = vadd({tileToWorld(unpack(astronaut.map.spawn))}, vmul({1,1}, TILESIZE/2))
         spaceInput = watchBinaryInput(keyboardCallback(" "))
         astronaut.onLadder = false
+        astronaut.position.x = 0 -- just to make sure it isn't nil
+        astronaut.position.y = 0
     end
 
     function astronaut.update()
@@ -52,6 +54,8 @@ do
             end
             astronaut.velocity[1] = astronaut.velocity[1] - astronaut.velocity[1] * frictionX * simulationDt -- x friction
             astronaut.velocity[2] = astronaut.velocity[2] - astronaut.velocity[2] * frictionY * simulationDt -- y friction
+            
+            astronaut.onTileX, astronaut.onTileY = worldToTiles(astronaut.map, astronaut.position[1], astronaut.position[2])
 
             if (astronaut.onGround or astronaut.onLadder) and spaceInput().pressed then
                 local jumpStrength = 13.5 * TILESIZE

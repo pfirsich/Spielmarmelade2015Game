@@ -12,13 +12,14 @@ require "enet"
 require "camera"
 require "mapgen"
 require "gfx"
+require "abilities"
 
 function love.load()
     spaceship.hudImage = love.graphics.newImage("media/images/ability_back.png")
     mouseLeftInput = watchBinaryInput(mouseButtonCallback("l"))
     mouseRightInput = watchBinaryInput(mouseButtonCallback("r"))
     initGFX()
-
+    abilities.load()
     setState(startscreen)
 end
 
