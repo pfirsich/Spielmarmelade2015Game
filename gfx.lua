@@ -202,12 +202,12 @@ function drawGame(seeall)
 
             for y = drawRange[1][2], drawRange[2][2] do
                 for x = drawRange[1][1], drawRange[2][1] do
-                    if map.mapMeta[y][x].light then
+                    if map.mapMeta[y][x].light and map.mapMeta[y][x].lightStatus then
                         local scale = 0.4
                         local posX, posY = tileToWorld(x, y)
                         posX = posX + TILESIZE/2
                         posY = posY + TILESIZE
-                        love.graphics.draw( spotlightImage, posX, posY, math.pi/2.0, math.min(map.mapMeta[y][x].lightHeight, 10), scale, 0.0, headlightImage:getHeight()*0.5)
+                        love.graphics.draw( spotlightImage, posX, posY, math.pi/2.0, math.min(map.mapMeta[y][x].lightHeight, 10), scale, 0.0, spotlightImage:getHeight()*0.5)
                     end
 
                     if map[y][x] == TILE_INDICES.GOAL then
