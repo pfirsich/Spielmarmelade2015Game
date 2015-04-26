@@ -85,17 +85,19 @@ do
                     local cur = y+1
                     while cur < level.height and level[cur][x] ~= TILE_INDICES.WALL do cur = cur + 1 end
                     level.mapMeta[y][x].lightHeight = (cur - y) / 10.0
-					
-					local function toggleLight()
-						if level.mapMeta[y][x].lightStatus then
-							level.mapMeta[y][x].lightStatus = false
-							delay(toggleLight, love.math.random(0.05, 0.5))
-						else
-							level.mapMeta[y][x].lightStatus = true
-							delay(toggleLight, love.math.random(2, 20))
-						end
-					end
-					toggleLight()
+
+                    local function toggleLight()
+                        level.mapMeta[y][x].lightStatus = not level.mapMeta[y][x].lightStatus
+
+                        if not level.mapMeta[y][x].lightSpazzo and level.mapMeta[y][x].lightStatus then
+                            delay(toggleLight, randf(2, 20))
+                        else
+                            delay(toggleLight, randf(0.05, 0.2))
+                        end
+
+                        level.mapMeta[y][x].lightSpazzo = love.math.random() > 0.2
+                    end
+                    toggleLight()
                 end
             end
         end
