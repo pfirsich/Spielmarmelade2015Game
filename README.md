@@ -27,7 +27,7 @@ A and D to move, space to jump
 ## Credits
 * Jonas Lieb (http://www.jonaslieb.com/) - 2-hour final spurt helper
 * Markus Over (http://shellfishgames.com/) - programming
-* Lukas Schneider - art
+* Lukas Schnitzler - art
 * Joel Schumacher (http://theshoemaker.de/) - programming
 
 ## Media
