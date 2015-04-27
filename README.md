@@ -14,9 +14,9 @@ Also the game was a very ambitious project, so the jam version is *very* incompl
 ## Technical
 This game is made using löve (https://love2d.org/), so it should run on any supported platform (please see the website for installation instructions).
 Archived jam versions can be found here:
-* [TerminationShock.love](link)
-* [TerminationShock-win32.zip](link)
-* [TerminationShock-win64.zip](link)
+* [TerminationShock.love](https://dl.dropboxusercontent.com/u/9961608/TerminationShock/Jam%20version/TerminationShock.love)
+* [TerminationShock-win32.zip](https://dl.dropboxusercontent.com/u/9961608/TerminationShock/Jam%20version/TerminationShock-win32.zip)
+* [TerminationShock-win64.zip](https://dl.dropboxusercontent.com/u/9961608/TerminationShock/Jam%20version/TerminationShock-win64.zip)
 
 ## Credits
 * Jonas Lieb (http://www.jonaslieb.com/) - 2-hour final spurt helper
