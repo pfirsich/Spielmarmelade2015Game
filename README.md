@@ -18,6 +18,12 @@ Archived jam versions can be found here:
 * [TerminationShock-win32.zip](https://dl.dropboxusercontent.com/u/9961608/TerminationShock/Jam%20version/TerminationShock-win32.zip)
 * [TerminationShock-win64.zip](https://dl.dropboxusercontent.com/u/9961608/TerminationShock/Jam%20version/TerminationShock-win64.zip)
 
+## Controls
+### Astronaut
+A and D to move, space to jump
+### Spaceship
+
+
 ## Credits
 * Jonas Lieb (http://www.jonaslieb.com/) - 2-hour final spurt helper
 * Markus Over (http://shellfishgames.com/) - programming
@@ -28,6 +34,7 @@ Archived jam versions can be found here:
 [GitHub](https://github.com/pfirsich/TerminationShock) (in case you read this readme on your local computer)
 
 [Video (Astronaut)](https://youtu.be/9zE_9D_5DmA)
+
 [Video (Spaceship)](https://youtu.be/o6lwj3CFpO0)
 
 ![Screenshot of astronaut player](https://raw.githubusercontent.com/pfirsich/TerminationShock/master/media/termshock_astro.png)
