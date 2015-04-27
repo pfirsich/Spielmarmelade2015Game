@@ -17,24 +17,29 @@ do
     function abilities.load()
         -- Load all abilities
         -- Sensors
-        abilities.add("Weight Sensor", "weight.png", false, "Triggers when weight stands on the sensor", 1, true, sensors.checkWeight, false, nil, placement_freeWall)
-        abilities.add("Movement Sensor", "move.png", false, "Triggers when something moves in its line of sight", 1, true, sensors.checkMovement, false, nil, placement_freeWall)
+        abilities.add("Weight Sensor", false, "weight.png", false, "Triggers when weight stands on the sensor", 1, true, sensors.checkWeight, false, nil, placement_freeWall)
+        abilities.add("Movement Sensor", true, "move.png", false, "Triggers when something moves in its line of sight", 1, true, sensors.checkMovement, false, nil, placement_freeWall)
         -- Actors
-        abilities.add("Stomp", "stomp.png", true, "Crushes whatever is underneath when triggered", 3, true, false, false, actors.stomp, placement_wall)
-        abilities.add("Vanishing Block", "vanish.png", true, "Vanishes when triggered", 2, true, false, false, actors.vanish, placement_wall)
+        abilities.add("Stomp", false, "stomp.png", true, "Crushes whatever is underneath when triggered", 3, true, false, false, actors.stomp, placement_wall)
+        abilities.add("Vanishing Block", false, "vanish.png", true, "Vanishes when triggered", 2, true, false, false, actors.vanish, placement_wall)
         -- abilities.add("Timer", "timer.png", "Waits for 3 seconds after being triggered before triggering itself", 1, true, false, false, actors.timer)
-        abilities.add("Fake", "fake.png", false, "Pretends to be a sensor/trap, but doesn't do anything", 1, true, false, false, nil, placement_free)
-        abilities.add("Spikes", "spikes.png", false, "Deathly Spikes coming out of the ground", 2, true, false, false, actors.spikes, placement_freeWall)
-        abilities.add("Bullet", "bullet.png", true, "Deathly Bullet destroying nasty astronauts", 2, true, false, false, actors.bullet, placement_freeWall)
+        abilities.add("Fake", true, "fake.png", false, "Pretends to be a sensor/trap, but doesn't do anything", 1, true, false, false, nil, placement_free)
+        abilities.add("Spikes", true, "spikes.png", false, "Deathly Spikes coming out of the ground", 2, true, false, false, actors.spikes, placement_freeWall)
+        abilities.add("Bullet", true, "bullet.png", true, "Deathly Bullet destroying nasty astronauts", 2, true, false, false, actors.bullet, placement_freeWall)
         -- Buffs
-        abilities.add("Camouflage", "camouflage.png", true, "Hides a trap from being seen", 2, true, false, actors.camouflage, nil, placement_trap)
+        abilities.add("Camouflage",  false, "camouflage.png", true, "Hides a trap from being seen", 2, true, false, actors.camouflage, nil, placement_trap)
         -- Survival
-        abilities.add("Teleport", "teleport.png", false, "Teleports you to a nearby position", 1, false, false, false, nil, nil)
+        abilities.add("Teleport", false, "teleport.png", false, "Teleports you to a nearby position", 1, false, false, false, nil, nil)
+        
+        -- Sprites
+        abilities.directionImage = love.graphics.newImage("media/images/ability/_direction.png")
     end
 
-    function abilities.add(name, image, hiddenByDefault, tooltip, cost, forAI, sensorFunc, buffFunc, triggerFunc, placementFunc)
+    function abilities.add(name, fourDirections, image, hiddenByDefault, tooltip, cost, forAI, sensorFunc, buffFunc, triggerFunc, placementFunc)
         abilityCount = abilityCount + 1
-        abilities[abilityCount] = {name = name,
+        abilities[abilityCount] = {
+            name = name,
+            directed = fourDirections,
             image = love.graphics.newImage("media/images/ability/" .. image),
             ingameImage = false,
             hidden = hiddenByDefault,
@@ -94,6 +99,7 @@ do
     end
 
     function abilities.placeTrap(ability, tx, ty, id, side)
+        if not ability.directed then side = 1 end
         if not ability.isBuff then
             trapCount = trapCount + 1
             traps[trapCount] = {tp = ability, id = id, tx = tx, ty = ty, active = true, hidden = ability.hidden, trgx = tx, trgy = ty, param = 0, angle = 0}

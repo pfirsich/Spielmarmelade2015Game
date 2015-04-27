@@ -391,19 +391,31 @@ function drawTraps(map)
     }
 
     local img = 0
+    local angle = 0
     for t = 1, trapCount do
         local trap = traps[t]
         if trap.active then love.graphics.setColor(255,255,255,255) else love.graphics.setColor(255,255,255,100) end
         if trap.tx >= drawRange[1][1] and trap.tx <= drawRange[2][1] then
             if trap.ty >= drawRange[1][2] and trap.ty <= drawRange[2][2] then
+                local tempx, tempy = tileToWorld(trap.tx+0.5, trap.ty+0.5)
+                angle = trap.angle
                 if getState() == astronaut then
+                    -- Astronaut View
                     if trap.hidden then img = false else img = trap.tp.ingameImage end
                 else
+                    -- Spaceship View
                     img = trap.tp.image
+                    if trap.tp.directed then
+                        -- Draw Arrow
+                        local oldcolor = {love.graphics.getColor()}
+                        love.graphics.setColor(255,255,255,128)
+                        love.graphics.draw(abilities.directionImage, tempx, tempy, trap.angle, 1.0, 1.0, 128, 145)
+                        love.graphics.setColor(oldcolor)
+                    end
+                    angle = 0
                 end
                 if img ~= false then
-                    local tempx, tempy = tileToWorld(trap.tx+0.5, trap.ty+0.5)
-                    love.graphics.draw(img, tempx, tempy, trap.angle, 1.0, 1.0, 128,128)
+                    love.graphics.draw(img, tempx, tempy, angle, 1.0, 1.0, 128,128)
                 else
                     if trap.tp.name == "Fake" then
                         img = abilities[trap.param].ingameImage
