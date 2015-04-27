@@ -319,6 +319,7 @@ function drawGame(seeall)
     -- map and players
     camera.push()
         drawMap(map)
+        if getState() == spaceship then drawTrapConnections(map) end
         drawTraps(map)
         bodies.draw()
 
@@ -354,6 +355,35 @@ function drawAstronaut(anim, head, offset)
                         angle, astronautScale * (astronaut.flipped and -1.0 or 1.0), astronautScale, 33, 74)
 end
 
+
+
+
+function drawTrapConnections(map)
+    local drawRange = {
+        {screenToTiles(map, 0, 0)},
+        {screenToTiles(map, love.window.getWidth(), love.window.getHeight())}
+    }
+    love.graphics.setColor(128,255,128,128)
+    for t = 1, trapCount do
+        local trap = traps[t]
+        if trap.trgx ~= trap.tx or trap.trgy ~= trap.ty then
+            local tx = trap.trgx
+            local ty = trap.trgy
+            if trap.tx >= drawRange[1][1] and trap.tx <= drawRange[2][1] or tx >= drawRange[1][1] and tx <= drawRange[2][1] then 
+                if trap.ty >= drawRange[1][2] and trap.ty <= drawRange[2][2] or ty >= drawRange[1][2] and ty <= drawRange[2][2] then
+                    -- Draw the Line
+                    local x1,y1 = tileToWorld(trap.tx+0.5, trap.ty+0.5)
+                    local x2,y2 = tileToWorld(tx+0.5, ty+0.5)
+                    love.graphics.line(x1,y1,x2,y2)
+                end
+            end
+        end
+    end
+    love.graphics.setColor(255,255,255,255)
+end
+
+
+
 function drawTraps(map)
     local drawRange = {
         {screenToTiles(map, 0, 0)},
@@ -363,6 +393,7 @@ function drawTraps(map)
     local img = 0
     for t = 1, trapCount do
         local trap = traps[t]
+        if trap.active then love.graphics.setColor(255,255,255,255) else love.graphics.setColor(255,255,255,100) end
         if trap.tx >= drawRange[1][1] and trap.tx <= drawRange[2][1] then
             if trap.ty >= drawRange[1][2] and trap.ty <= drawRange[2][2] then
                 if getState() == astronaut then

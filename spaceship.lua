@@ -159,8 +159,8 @@ do
                             local trg = traps.getTrapAtPoint(mtx, mty)
                             if trg then
                                 -- Apply
-                                spaceship.dragSource.trgX = trg.tx
-                                spaceship.dragSource.trgY = trg.ty
+                                spaceship.dragSource.trgx = trg.tx
+                                spaceship.dragSource.trgy = trg.ty
                                 -- Send to Astronaut
                                 spaceship.astronautPeer:send("CNTRP:" .. spaceship.dragSource.id .. ":" .. trg.id)
                                 print("Traps connected: " .. spaceship.dragSource.tp.name .. " to " .. trg.tp.name)
