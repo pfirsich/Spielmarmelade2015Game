@@ -108,21 +108,27 @@ do
             if mouseY >= spaceship.hudTop then
                 moveBorder = 12
             else
-                -- not on HUD -> place tile?
+                -- not on HUD 
                 local mtx, mty = screenToTiles(spaceship.map, mouseX, mouseY)
+                -- relative mouse position (side of tile)
+                local worldMouseX, worldMouseY = camera.screenToWorld(mouseX, mouseY)
+                local localMouseX, localMouseY = worldMouseX - (mtx - 0.5) * TILESIZE, worldMouseY - (mty - 0.5) * TILESIZE
+                local localMouseAngle = vangle({localMouseX, localMouseY})
+                side = 0
+                if math.abs(localMouseAngle) <= math.pi / 4.0 then side = 0 end
+                if localMouseAngle >=  math.pi/4.0 and localMouseAngle <=  math.pi/4.0 + math.pi/2.0 then side = 1 end
+                if localMouseAngle <= -math.pi/4.0 and localMouseAngle >= -math.pi/4.0 - math.pi/2.0 then side = 3 end
+                if math.abs(localMouseAngle) >= math.pi/4.0 + math.pi/2.0 then side = 2 end
+                -- store for HUD drawing
+                spaceship.hovertilex = mtx
+                spaceship.hovertiley = mty
+                spaceship.hoverSide = side
                 if mouseL then
-                    local worldMouseX, worldMouseY = camera.screenToWorld(mouseX, mouseY)
                     local rel = {worldMouseX - astronaut.position[1], worldMouseY - astronaut.position[2]}
                     if rel[1]*rel[1] + rel[2]*rel[2] > astronaut.safeRadius*astronaut.safeRadius then
                         if spaceship.selected > 0 then
                             -- place trap
                             if spaceship.buttons[spaceship.selected].ability.placementFunction(mtx, mty) then
-                                local localMouseX, localMouseY = worldMouseX - (mtx - 0.5) * TILESIZE, worldMouseY - (mty - 0.5) * TILESIZE
-                                local localMouseAngle = vangle({localMouseX, localMouseY})
-                                if math.abs(localMouseAngle) <= math.pi / 4.0 then side = 0 end
-                                if localMouseAngle >=  math.pi/4.0 and localMouseAngle <=  math.pi/4.0 + math.pi/2.0 then side = 1 end
-                                if localMouseAngle <= -math.pi/4.0 and localMouseAngle >= -math.pi/4.0 - math.pi/2.0 then side = 3 end
-                                if math.abs(localMouseAngle) >= math.pi/4.0 + math.pi/2.0 then side = 2 end
 
                                 print("Placing trap because placement function returned true")
                                 trapID = trapID + 1
@@ -228,6 +234,20 @@ do
 
 
     function spaceship.drawHUD()
+        -- Currently Creating an ability -> tile frame/preview
+        if spaceship.selected > 0 then
+            if spaceship.hovered == 0 then
+                love.graphics.setColor(128,128,255,128)
+                -- Frame
+                local sx, sy = tilesToScreen(spaceship.hovertilex+0.5, spaceship.hovertiley+0.5)
+                love.graphics.draw( abilities.frameImage, sx, sy, 0, camera.scale, camera.scale, 130,130)
+                -- Direction
+                if spaceship.buttons[spaceship.selected].ability.directed then
+                    love.graphics.draw( abilities.directionImage, sx, sy, math.pi*0.5*spaceship.hoverSide - math.pi*0.5, camera.scale, camera.scale, 128,145 )
+                end
+                love.graphics.setColor(255,255,255,255)
+            end
+        end
         -- Cycle through abilities
         local yoff = 0
         for i = 1, spaceship.abilities do

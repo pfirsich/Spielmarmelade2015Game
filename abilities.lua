@@ -33,6 +33,7 @@ do
         
         -- Sprites
         abilities.directionImage = love.graphics.newImage("media/images/ability/_direction.png")
+        abilities.frameImage = love.graphics.newImage("media/images/ability/_frame.png")
     end
 
     function abilities.add(name, fourDirections, image, hiddenByDefault, tooltip, cost, forAI, sensorFunc, buffFunc, triggerFunc, placementFunc)
