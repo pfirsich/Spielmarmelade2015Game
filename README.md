@@ -22,7 +22,8 @@ Archived jam versions can be found here:
 ### Astronaut
 A and D to move, space to jump
 ### Spaceship
-
+Select an ability (click on the icon) and place it in the map. Sensors and traps can (and should) be connected, so the sensors activates the trap by dragging a line (left click) from a sensor to the trap. In the jam version existing connections are not rendered yet. The direction of sensors and traps is determined by where exactly inside the level tile you click. See this image to see how points inside the rectangle are mapped to edges and therefore directions:
+![Directions in tile](https://raw.githubusercontent.com/pfirsich/TerminationShock/master/media/dirding.png)
 
 ## Credits
 * Jonas Lieb (http://www.jonaslieb.com/) - 2-hour final spurt helper
